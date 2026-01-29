@@ -21,7 +21,7 @@ Flooded Gems has been an ongoing personal project where functions are being impl
 - Online multiplayer
 
 ## Screenshots
-![A working prototype of Flooded Gems](Screenshots\Prototype_Gameplay.png)
+![A working prototype of Flooded Gems](Screenshots/Prototype_Gameplay.png)
 
 ## Author
 **Ian Anderson**  
