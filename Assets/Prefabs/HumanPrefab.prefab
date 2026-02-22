@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerName: Default Player
+  playerColor: 0
   actionsLeft: 0
   startingSpace: {fileID: 0}
   currentSpace: {fileID: 0}

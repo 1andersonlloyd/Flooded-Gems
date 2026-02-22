@@ -16,7 +16,7 @@ public class GemsUI : MonoBehaviour
     void Start()
     {
         gemImages = new List<Image>(GetComponentsInChildren<Image>());
-        Debug.Log(gemImages.Count + " gem images found in player plaque");
+        //Debug.Log(gemImages.Count + " gem images found in player plaque");
         SetAllGemQuantity(new int[6] { 0, 0, 0, 0, 0, 0 });
     }
 

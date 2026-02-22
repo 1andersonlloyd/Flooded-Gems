@@ -911,8 +911,9 @@ MonoBehaviour:
   plaqueImage: {fileID: 2001343941928181577}
   playerName: {fileID: 3423609921313979239}
   itemBagSprite: {fileID: 5822158637931054234}
-  itemCount: {fileID: 2240850217668539727}
-  gemInventoryUI: {fileID: 0}
+  itemCounter: {fileID: 2240850217668539727}
+  stashSprite: {fileID: 4879580670319798806}
+  gemInventoryUI: {fileID: 8437632529170331433}
   gemSprites:
   - {fileID: 7660050077559132166, guid: ef0d46e05f049344d906fe090707375c, type: 3}
   - {fileID: 203462974547555852, guid: ef0d46e05f049344d906fe090707375c, type: 3}

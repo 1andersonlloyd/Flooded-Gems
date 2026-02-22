@@ -13,10 +13,15 @@ public class PlayerPlaque : MonoBehaviour
     [SerializeField]
     protected Image itemBagSprite;
     [SerializeField]
-    protected TextMeshProUGUI itemCount;
-    
+    protected TextMeshProUGUI itemCounter;
+    [SerializeField]
+    protected Image stashSprite;
     [SerializeField]
     protected GemsUI gemInventoryUI;
+
+
+    PlayerController player;
+
 
 
 
@@ -31,11 +36,12 @@ public class PlayerPlaque : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        SetPlayerColor(0);
     }
 
-    public void initialize(int playerColor, string name)
+    public void Initialize(PlayerController player, int playerColor, string name)
     {
+        this.player = player;
+        player.inventory.onInventoryChanged += InventoryChanged;
         SetPlayerColor(playerColor);
         SetName(name);
     }
@@ -51,7 +57,8 @@ public class PlayerPlaque : MonoBehaviour
     public void SetPlayerColor(int color)
     {
         plaqueImage.sprite = plaqueSprites[color];
-
+        stashSprite.sprite = stashSprites[color];
+        Debug.Log(color + " ID");
     }
 
 #region GemsUI
@@ -74,23 +81,13 @@ public class PlayerPlaque : MonoBehaviour
 
     public void SetItemQuantity(int num)
     {
-        itemCount.text = num.ToString();
+        itemCounter.text = num.ToString();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
-
     
-    public void UpdatePlaque()
+    public void InventoryChanged(int[] gemArray, int itemCount)
     {
-        
-
-
+        SetAllGemQuantity(gemArray);
+        itemCounter.text = itemCount.ToString();
     }
 
 }

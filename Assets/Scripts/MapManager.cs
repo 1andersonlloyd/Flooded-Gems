@@ -14,7 +14,10 @@ public class MapManager : MonoBehaviour
 
     // Makes sure to add Stashes and remove them from this vvv
     public List<BoardSpace> digSpotSpaces = new List<BoardSpace>();
-    public BoardSpace greenSpace ;
+    public BoardSpace greenSpace;
+
+    public List<PlayerController> players;
+
 
     private void Awake()
     {
@@ -37,7 +40,9 @@ public class MapManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        PlayerController.playerMoving += OnPlayerMove;
+        players = StateManager.Instance.players;
+        ShiftPlayersOnSpace();
     }
 
     // Update is called once per frame
@@ -222,6 +227,73 @@ public class MapManager : MonoBehaviour
             }
         }
         Debug.Log("Found " + digSpotSpaces.Count + " dig spot spaces and stored the list");
+    }
+
+
+    void OnPlayerMove(PlayerController player, BoardSpace targetSpace)
+    {
+        ShiftPlayersOnSpace();
+    }
+
+    // Make it so players don't overlap
+    public void ShiftPlayersOnSpace()
+    {
+
+        float offSetDistance = 0.5f;
+        List<Vector3> offsets2 = new List<Vector3> {new Vector3(-1, 0, 0.0f), new Vector3(1, 0, -0.1f)};
+        List<Vector3> offsets3 = new List<Vector3> {new Vector3(0, 1, 0.0f), new Vector3(1, -1, -0.1f), new Vector3(-1, -1, -0.2f)};
+        List<Vector3> offsets4 = new List<Vector3> {new Vector3(-1, 1, 0.0f), new Vector3(1, 1, -0.1f), new Vector3(-1, -1, -0.2f), new Vector3(1, -1, -0.3f)};
+
+
+        for(int i = 0; i < players.Count; i++)
+        {
+            int myIndex = 0;
+            int totalOthersOnSpace = 0;
+            for (int j = 0; j < players.Count; j++)
+            {
+                
+                if(i == j)
+                {
+                    continue;
+                }
+                else
+                {
+                    if(players[i].currentSpace == players[j].currentSpace)
+                    {
+                        totalOthersOnSpace++;
+                        if (i > j)
+                        {
+                            myIndex++;
+                        }
+                    }
+                }
+                switch (totalOthersOnSpace)
+                {
+                    case 0:
+                        // Check to see if there is a dig, if so, offset regardless of players
+                        if(players[i].currentSpace.digSpot != null)
+                        {
+                            goto case 1;
+                        }
+                        players[i].targetPosition = players[i].currentSpace.transform.position;
+                        break;
+                    case 1:
+                        players[i].targetPosition = players[i].currentSpace.transform.position + offsets2[myIndex] * offSetDistance;
+                        break;
+                    case 2:
+                        players[i].targetPosition = players[i].currentSpace.transform.position + offsets3[myIndex] * offSetDistance;
+                        break;
+                    case 3:
+                        players[i].targetPosition = players[i].currentSpace.transform.position + offsets4[myIndex] * offSetDistance;
+                        break;
+                    default:
+                        Debug.LogError("Invalid number of players found on this space. " + totalOthersOnSpace + " other players found on " + players[i].playerName + "'s space");
+                    break;
+                }
+            }
+        }
+
+
     }
 
 

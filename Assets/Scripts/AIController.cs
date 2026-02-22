@@ -10,14 +10,18 @@ public class AIController : PlayerController
     
     public BoardSpace destinationSpace = null;
     int focusValue = 0;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
     protected override void Start()
     {
         base.Start();
         
     }
 
-    // Update is called once per frame
     protected override void Update()
     {
         base.Update();
@@ -294,5 +298,35 @@ public class AIController : PlayerController
     }
 
 
+    void OnDrawGizmos()
+    {
+        // Draw a line from this object towards the target space
+        if(destinationSpace != null)
+        {
+            switch (playerColor)
+            {
+                case PlayerColor.Blue:
+                    Gizmos.color = Color.blue;
+                    break;
+                case PlayerColor.Red:
+                    Gizmos.color = Color.red;
+                    break;
+                case PlayerColor.Green:
+                    Gizmos.color = Color.green;
+                    break;
+                case PlayerColor.Yellow:
+                    Gizmos.color = Color.yellow;
+                    break;
+                default:
+                    Gizmos.color = Color.magenta;
+                    Debug.LogError("Undefined player color");
+                    break;
+            }
 
+            Gizmos.DrawLine(transform.position, destinationSpace.transform.position);
+
+            // Draw a circle at the target space
+            Gizmos.DrawWireSphere(destinationSpace.transform.position, 0.5f + ((float)playerColor / 10));
+        }
+    }
 }

@@ -2,11 +2,16 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 using System;
+using UnityEngine.Events;
 using NUnit.Framework;
 using UnityEngine.UIElements;
+public enum PlayerColor { Blue, Red, Green, Yellow}
+
 public abstract class PlayerController : MonoBehaviour
 {
     public string playerName = "Default Player";
+
+    public PlayerColor playerColor = 0;
 
     public int actionsLeft = 0;
     public BoardSpace startingSpace;
@@ -23,13 +28,20 @@ public abstract class PlayerController : MonoBehaviour
     public DigSpot lastSuccessfulDigSpot = null;
     public bool aiSelectNewGoal = false; // A flag to let AI versions know that they need to recalculate their destination space
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    protected virtual void Start()
+    public static Action<PlayerController, BoardSpace> playerMoving;
+
+
+    protected virtual void Awake()
     {
+        inventory = new Inventory();
         spriteRenderer = GetComponent<SpriteRenderer>();
         targetPosition = transform.position;
         spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1);
-        inventory = new Inventory();
+    }
+
+    protected virtual void Start()
+    {
+        
     }
 
     protected virtual void Update()
@@ -53,6 +65,7 @@ public abstract class PlayerController : MonoBehaviour
         transform.position = startingSpace.transform.position;
         targetPosition = transform.position;
         spriteRenderer.sprite = playerSprites[Math.Min(spriteIndex, playerSprites.Count)];
+        playerColor = (PlayerColor)spriteIndex;
     }
 
     public virtual void StartTurn()
@@ -87,6 +100,8 @@ public abstract class PlayerController : MonoBehaviour
         currentSpace = targetSpace;
 
         actionsLeft -= path.Count - 1;
+        
+        playerMoving?.Invoke(this, targetSpace);
     }
 
     public virtual void ExecuteJump(BoardSpace targetSpace)
@@ -98,6 +113,8 @@ public abstract class PlayerController : MonoBehaviour
 
         // Update player's board space
         currentSpace = targetSpace;
+        playerMoving?.Invoke(this, targetSpace);
+
     }
 
     public virtual void ExecuteDig()
@@ -187,6 +204,7 @@ public class Inventory
 
     public List<Item> items = new List<Item>();
     public int[] gems = new int[6];
+    public Action<int[], int> onInventoryChanged;
 
     // Gem management
     public void AddGem(GemType gem)
@@ -194,7 +212,7 @@ public class Inventory
         Debug.Log("Adding " + gem.ToString() + " gem to inventory");
         gems[(int)gem] += 1;
         Debug.Log("Updated Gem Array" + GetGemArrayString());
-
+        UpdateListeners();
     }
     public bool HasGem(GemType gem)
     {
@@ -208,6 +226,7 @@ public class Inventory
     {
         Debug.Log("Removing " + gem.ToString() + " gem from inventory");
         gems[(int)gem] -= 1;
+        UpdateListeners();
     }
     public int[] GetGemArray()
     {
@@ -237,6 +256,7 @@ public class Inventory
     
         Debug.Log("Adding item " + item.itemName + " to inventory");
         items.Add(item);
+        UpdateListeners();
     }
     
     public void RemoveItem(Item item)
@@ -245,6 +265,7 @@ public class Inventory
         {
             items.Remove(item);
         }
+        UpdateListeners();
     }
 
     public void UseItem(Item item)
@@ -254,9 +275,15 @@ public class Inventory
             Debug.Log("Error, item does not exist in inventory");
             return;
         }
-
-
-
-
+        UpdateListeners();
+    
     }
+
+    void UpdateListeners()
+    {
+        onInventoryChanged?.Invoke(GetGemArray(), items.Count);
+    }
+
+
+
 }

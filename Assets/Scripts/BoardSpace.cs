@@ -81,7 +81,7 @@ public class BoardSpace : MonoBehaviour
         neighbors = selection.Select(x => x.GetComponent<BoardSpace>()).ToList();
         Debug.Log("Assigned " + neighbors.Count + " objects.");
     }
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.purple;
         Gizmos.DrawSphere(transform.position, 0.2f);

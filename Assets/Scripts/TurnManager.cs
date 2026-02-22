@@ -15,6 +15,8 @@ public class TurnManager : MonoBehaviour
     public static TurnManager Instance { get; private set; }
     public HumanController humanPrefab;
     public AIController aiPrefab;
+    public PlayerPlaque playerPlaquePrefab;
+    public RectTransform plaqueBar;
     public ButtonBar currentTurnButtonBar;
     public DigButton digButton; 
 
@@ -72,7 +74,7 @@ public class TurnManager : MonoBehaviour
     {
         // TODO: Add some menu or something here for deciding players and hosting?
 
-        InitializePlayers(1, 2);
+        InitializePlayers(1, 3);
 
         // TODO: Set flood values to default
 
@@ -91,15 +93,35 @@ public class TurnManager : MonoBehaviour
             return;
         }
 
+        List<float> plaqueYCoords;
+        switch (numHumans + numAI)
+        {
+            case 2:
+                plaqueYCoords = new List<float> { 0.75f, 0.25f };
+
+            break;
+            case 3:
+                plaqueYCoords = new List<float> { 0.8333f, 0.5f, 0.1666f };
+            break;
+
+            case 4:
+                plaqueYCoords = new List<float> { 0.875f, 0.625f, 0.375f, 0.125f };
+            break;
+            default:
+                Debug.LogError("Unsupported number of players. " + numAI + numHumans + " players passed.");
+                return;
+        }
+
         // Add human players
         for (int i = 0; i < numHumans; i++)
         {
             string name = "Human " + (i + 1);
             HumanController human = Instantiate(humanPrefab);
             human.InitializePlayer(name, startingSpace, playerNumIncrement++);
-
             StateManager.Instance.players.Add(human);
             
+            AddPlayerPlaque(human, plaqueBar, plaqueYCoords[i], i);
+
 
             // TODO: For now just setting the first player as the local player
             if (i == 0)
@@ -110,16 +132,31 @@ public class TurnManager : MonoBehaviour
         }
 
         // Add ai players
-        for (int i = 0; i < numAI; i++)
+        for (int i = numHumans; i < numHumans + numAI; i++)
         {
             string name = "CPU " + (i + 1);
             AIController ai = Instantiate(aiPrefab);
             ai.InitializePlayer(name, startingSpace, playerNumIncrement++);
             StateManager.Instance.players.Add(ai);
-
+            
+            AddPlayerPlaque(ai, plaqueBar, plaqueYCoords[i], i);
         }
-
     }
+
+    void AddPlayerPlaque(PlayerController player, RectTransform rectTransform, float plaqueYCoord, int playerID)
+    {
+        // Instantiate plaque as a child of the rectTransform object
+        PlayerPlaque plaque = Instantiate(playerPlaquePrefab, rectTransform);
+        RectTransform plaqueRectTransform = plaque.GetComponent<RectTransform>();
+        plaqueRectTransform.anchorMax = new Vector2(0.5f, plaqueYCoord);
+        plaqueRectTransform.anchorMin = new Vector2(0.5f, plaqueYCoord);
+
+        plaque.Initialize(player, playerID, player.playerName);
+    }
+
+
+
+
     #endregion
 
     #region PlayerTurn
