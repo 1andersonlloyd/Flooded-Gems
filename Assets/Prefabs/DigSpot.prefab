@@ -46,11 +46,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 969ef1c42426e5c4dafabe24c462498c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spriteRenderer: {fileID: 0}
+  spriteRenderer: {fileID: 734357151600548634}
   textMeshRenderer: {fileID: 3641656880042161799}
-  blackText: 0
-  gemSpot: 1
+  gemType: 6
   rollGoal: 0
+  digSpotType: 0
 --- !u!212 &734357151600548634
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -95,7 +95,7 @@ SpriteRenderer:
   m_SortingLayerID: 524078055
   m_SortingLayer: 2
   m_SortingOrder: 0
-  m_Sprite: {fileID: 6753631882245339975, guid: ef0b08b8511a2d849980eed1e4bb6de2, type: 3}
+  m_Sprite: {fileID: 7660050077559132166, guid: ef0d46e05f049344d906fe090707375c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -140,7 +140,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.269}
+  m_AnchoredPosition: {x: -0.004, y: 0.216}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &2950776978333540393
@@ -208,7 +208,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: X
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

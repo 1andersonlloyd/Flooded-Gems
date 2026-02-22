@@ -77,7 +77,7 @@ SpriteRenderer:
   m_SortingLayerID: 88742927
   m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: 8480759461378854966, guid: beaf2747cfb8db240842e7266d33241d, type: 3}
+  m_Sprite: {fileID: 4131066349628621515, guid: f9ad06b78a06aa7439a0a4faa365d148, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -107,10 +107,10 @@ MonoBehaviour:
   targetPosition: {x: 0, y: 0, z: 0}
   spriteRenderer: {fileID: 7887996747679070871}
   playerSprites:
-  - {fileID: 2767613393833410388, guid: beaf2747cfb8db240842e7266d33241d, type: 3}
-  - {fileID: 8480759461378854966, guid: beaf2747cfb8db240842e7266d33241d, type: 3}
-  - {fileID: -4144672622850559410, guid: beaf2747cfb8db240842e7266d33241d, type: 3}
-  - {fileID: 3618730387935915179, guid: beaf2747cfb8db240842e7266d33241d, type: 3}
+  - {fileID: -3534444663357604443, guid: f9ad06b78a06aa7439a0a4faa365d148, type: 3}
+  - {fileID: 4131066349628621515, guid: f9ad06b78a06aa7439a0a4faa365d148, type: 3}
+  - {fileID: -226039422429021957, guid: f9ad06b78a06aa7439a0a4faa365d148, type: 3}
+  - {fileID: -5812213605580594322, guid: f9ad06b78a06aa7439a0a4faa365d148, type: 3}
   targetAlpha: 1
   lastSuccessfulDigSpot: {fileID: 0}
   aiSelectNewGoal: 0

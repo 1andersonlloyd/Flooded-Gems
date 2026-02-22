@@ -6,7 +6,6 @@ public class DigSpot : MonoBehaviour
 {
     public SpriteRenderer spriteRenderer;
     public TextMeshPro textMeshRenderer;
-    public bool blackText = false;
     public Inventory.GemType gemType = Inventory.GemType.None;
     // The number 1-6 that needs to be rolled to successfully loot this spot
     public int rollGoal = 0;

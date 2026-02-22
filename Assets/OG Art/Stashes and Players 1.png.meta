@@ -1,0 +1,442 @@
+fileFormatVersion: 2
+guid: 67d31dab0f96ee24fa2fc3116a21f191
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1237353410055531977
+    second: Stashes and Players 1_0
+  - first:
+      213: 5883603736137510023
+    second: Stashes and Players 1_1
+  - first:
+      213: -6291113793801253459
+    second: Stashes and Players 1_2
+  - first:
+      213: 7588488626927567724
+    second: Stashes and Players 1_3
+  - first:
+      213: 1067852073461006387
+    second: Stashes and Players 1_4
+  - first:
+      213: -5152851582749996552
+    second: Stashes and Players 1_5
+  - first:
+      213: 7422245422053748311
+    second: Stashes and Players 1_6
+  - first:
+      213: 6150704279167120936
+    second: Stashes and Players 1_7
+  - first:
+      213: 9116308980716435116
+    second: Stashes and Players 1_8
+  - first:
+      213: -4840185116125952770
+    second: Stashes and Players 1_9
+  - first:
+      213: -4666827418970171606
+    second: Stashes and Players 1_10
+  - first:
+      213: -5900738154635781248
+    second: Stashes and Players 1_11
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Stashes and Players 1_0
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 473
+        width: 203
+        height: 219
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 732950c11a904dee0800000000000000
+      internalID: -1237353410055531977
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stashes and Players 1_1
+      rect:
+        serializedVersion: 2
+        x: 564
+        y: 468
+        width: 203
+        height: 219
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78c23a3ec62c6a150800000000000000
+      internalID: 5883603736137510023
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stashes and Players 1_2
+      rect:
+        serializedVersion: 2
+        x: 1076
+        y: 468
+        width: 203
+        height: 219
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dad8ae6165971b8a0800000000000000
+      internalID: -6291113793801253459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stashes and Players 1_3
+      rect:
+        serializedVersion: 2
+        x: 1585
+        y: 461
+        width: 203
+        height: 219
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c630c1e533abf4960800000000000000
+      internalID: 7588488626927567724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stashes and Players 1_4
+      rect:
+        serializedVersion: 2
+        x: 172
+        y: 162
+        width: 110
+        height: 203
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 330ce479dc5c1de00800000000000000
+      internalID: 1067852073461006387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stashes and Players 1_5
+      rect:
+        serializedVersion: 2
+        x: 598
+        y: 169
+        width: 110
+        height: 203
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f980e559c46d78b0800000000000000
+      internalID: -5152851582749996552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stashes and Players 1_6
+      rect:
+        serializedVersion: 2
+        x: 1111
+        y: 165
+        width: 110
+        height: 203
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75e6849f2ec110760800000000000000
+      internalID: 7422245422053748311
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stashes and Players 1_7
+      rect:
+        serializedVersion: 2
+        x: 1629
+        y: 150
+        width: 110
+        height: 203
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8263b3e34f0bb5550800000000000000
+      internalID: 6150704279167120936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stashes and Players 1_8
+      rect:
+        serializedVersion: 2
+        x: 686
+        y: 97
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca67e4ab7b2a38e70800000000000000
+      internalID: 9116308980716435116
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stashes and Players 1_9
+      rect:
+        serializedVersion: 2
+        x: 1199
+        y: 93
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef40e22084534dcb0800000000000000
+      internalID: -4840185116125952770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stashes and Players 1_10
+      rect:
+        serializedVersion: 2
+        x: 260
+        y: 90
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a27da3830391c3fb0800000000000000
+      internalID: -4666827418970171606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stashes and Players 1_11
+      rect:
+        serializedVersion: 2
+        x: 1717
+        y: 78
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08b175c69ed5c1ea0800000000000000
+      internalID: -5900738154635781248
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Stashes and Players 1_0: -1237353410055531977
+      Stashes and Players 1_1: 5883603736137510023
+      Stashes and Players 1_10: -4666827418970171606
+      Stashes and Players 1_11: -5900738154635781248
+      Stashes and Players 1_2: -6291113793801253459
+      Stashes and Players 1_3: 7588488626927567724
+      Stashes and Players 1_4: 1067852073461006387
+      Stashes and Players 1_5: -5152851582749996552
+      Stashes and Players 1_6: 7422245422053748311
+      Stashes and Players 1_7: 6150704279167120936
+      Stashes and Players 1_8: 9116308980716435116
+      Stashes and Players 1_9: -4840185116125952770
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
