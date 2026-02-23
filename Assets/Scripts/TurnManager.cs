@@ -17,10 +17,13 @@ public class TurnManager : MonoBehaviour
     public AIController aiPrefab;
     public PlayerPlaque playerPlaquePrefab;
     public RectTransform plaqueBar;
+    List<PlayerPlaque> playerPlaques = new List<PlayerPlaque>();
     public ButtonBar currentTurnButtonBar;
     public DigButton digButton; 
 
     public BoardSpace startingSpace;
+    public int actionsPerTurn = 3;
+
 
     public float waitTime = 5f;
     public bool waitInterrupted = false;
@@ -93,6 +96,8 @@ public class TurnManager : MonoBehaviour
             return;
         }
 
+
+        // Creating the Player Plaque layouts
         List<float> plaqueYCoords;
         switch (numHumans + numAI)
         {
@@ -134,7 +139,7 @@ public class TurnManager : MonoBehaviour
         // Add ai players
         for (int i = numHumans; i < numHumans + numAI; i++)
         {
-            string name = "CPU " + (i + 1);
+            string name = "CPU " + (i + 1 - numHumans);
             AIController ai = Instantiate(aiPrefab);
             ai.InitializePlayer(name, startingSpace, playerNumIncrement++);
             StateManager.Instance.players.Add(ai);
@@ -150,10 +155,22 @@ public class TurnManager : MonoBehaviour
         RectTransform plaqueRectTransform = plaque.GetComponent<RectTransform>();
         plaqueRectTransform.anchorMax = new Vector2(0.5f, plaqueYCoord);
         plaqueRectTransform.anchorMin = new Vector2(0.5f, plaqueYCoord);
-
+        playerPlaques.Add(plaque);
         plaque.Initialize(player, playerID, player.playerName);
     }
 
+    public PlayerPlaque GetPlayerPlaque(PlayerController player)
+    {
+        foreach(PlayerPlaque plaque in playerPlaques)
+        {
+            if(plaque.player == player)
+            {
+                return plaque;
+            }
+        }
+        Debug.LogError("Could not find plaque for player " + player.playerName);
+        return null;
+    }
 
 
 

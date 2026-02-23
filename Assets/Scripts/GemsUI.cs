@@ -65,10 +65,9 @@ public class GemsUI : MonoBehaviour
         }
     }
 
-
-    // Update is called once per frame
-    void Update()
+    public RectTransform GetGemRectTransform(int i)
     {
-        
+        return gemImages[i].GetComponent<RectTransform>();
     }
+ 
 }

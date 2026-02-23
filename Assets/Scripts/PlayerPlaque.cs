@@ -20,7 +20,7 @@ public class PlayerPlaque : MonoBehaviour
     protected GemsUI gemInventoryUI;
 
 
-    PlayerController player;
+    public PlayerController player;
 
 
 
@@ -76,18 +76,38 @@ public class PlayerPlaque : MonoBehaviour
         gemInventoryUI.SetGemQuantity(gemType, num);
 
     }
+
+    public RectTransform GetElementRectTransform(int i)
+    {
+        if(i < 6){
+            return gemInventoryUI.GetGemRectTransform(i);
+        }else if (i == 6)
+        {
+            // Get the item symbol's RectTransform
+            return itemBagSprite.GetComponent<RectTransform>();
+        }else if (i == 7)
+        {
+            // Get the stash symbol's RectTransform
+            return stashSprite.GetComponent<RectTransform>();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
 #endregion
 
 
     public void SetItemQuantity(int num)
     {
-        itemCounter.text = num.ToString();
+        itemCounter.text = "X " + num.ToString();
     }
     
     public void InventoryChanged(int[] gemArray, int itemCount)
     {
         SetAllGemQuantity(gemArray);
-        itemCounter.text = itemCount.ToString();
+        SetItemQuantity(itemCount);
     }
 
 }

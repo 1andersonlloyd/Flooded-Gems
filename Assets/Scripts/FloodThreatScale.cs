@@ -11,7 +11,7 @@ public class FloodThreatScale : MonoBehaviour
     { (2, BoardSpace.SpaceType.Black),
         (4, BoardSpace.SpaceType.Red),
         (7, BoardSpace.SpaceType.Yellow),
-        (10, BoardSpace.SpaceType.Blue),
+        (10, BoardSpace.SpaceType.Yellow),
         (12, BoardSpace.SpaceType.Green) };
 
     public GameObject threatToken;

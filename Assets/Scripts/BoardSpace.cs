@@ -15,16 +15,16 @@ public class BoardSpace : MonoBehaviour
     public enum SpaceType
     {
         Green = 1,
-        Blue = 2,
-        Yellow = 3,
+        Yellow = 2,
+        Orange = 3,
         Red = 4,
         Black = 5
     }
     public static readonly Dictionary<SpaceType, Color> Colors = new Dictionary<SpaceType, Color>
     {
         { SpaceType.Green, Color.green },
-        { SpaceType.Blue, Color.blue },
         { SpaceType.Yellow, Color.yellow },
+        { SpaceType.Orange, Color.orange },
         { SpaceType.Red, Color.red },
         { SpaceType.Black, Color.black }
     };
@@ -81,7 +81,7 @@ public class BoardSpace : MonoBehaviour
         neighbors = selection.Select(x => x.GetComponent<BoardSpace>()).ToList();
         Debug.Log("Assigned " + neighbors.Count + " objects.");
     }
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
         Gizmos.color = Color.purple;
         Gizmos.DrawSphere(transform.position, 0.2f);

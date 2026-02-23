@@ -71,7 +71,7 @@ public abstract class PlayerController : MonoBehaviour
     public virtual void StartTurn()
     {
         Debug.Log("Starting Turn for " + playerName);
-        actionsLeft = 3;
+        actionsLeft = TurnManager.Instance.actionsPerTurn;
         StateManager.Instance.currentPhase = TurnPhase.WaitingForPlayerInput;
     }
 
@@ -212,7 +212,10 @@ public class Inventory
         Debug.Log("Adding " + gem.ToString() + " gem to inventory");
         gems[(int)gem] += 1;
         Debug.Log("Updated Gem Array" + GetGemArrayString());
-        UpdateListeners();
+
+        // UpdateListeners();
+        // Not updating here to instead allow for the flying item script to time it correctly with the item's arrival
+
     }
     public bool HasGem(GemType gem)
     {
@@ -256,7 +259,8 @@ public class Inventory
     
         Debug.Log("Adding item " + item.itemName + " to inventory");
         items.Add(item);
-        UpdateListeners();
+        //UpdateListeners();
+        // Not updating here to instead allow for the flying item script to time it correctly with the item's arrival
     }
     
     public void RemoveItem(Item item)
@@ -279,7 +283,7 @@ public class Inventory
     
     }
 
-    void UpdateListeners()
+    public void UpdateListeners()
     {
         onInventoryChanged?.Invoke(GetGemArray(), items.Count);
     }
