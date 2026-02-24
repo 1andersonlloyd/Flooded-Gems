@@ -30,7 +30,9 @@ public class DigButton : MonoBehaviour
         if (TurnManager.Instance.RequestToDig(StateManager.Instance.localPlayer))
         {
             Debug.Log($"[{nameof(DigButton)}] Dig Request Accepted");
+            StateManager.Instance.localPlayer.ExecuteDig();
         }
+
     }
 
     public int RollDie()

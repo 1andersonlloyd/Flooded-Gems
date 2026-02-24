@@ -26,8 +26,6 @@ public class FlyingItem : MonoBehaviour
     {
         if(staticPrefab == null){
             staticPrefab = Resources.Load<FlyingItem>("Flying Item");
-            Debug.Log("Loading flying item prefab");
-            Debug.Log(staticPrefab.name);
         }
     }
 

@@ -229,17 +229,18 @@ public class TurnManager : MonoBehaviour
     {
         if (currentPlayer != player)
         {
-            Debug.LogError("It is not player's turn");
+            Debug.LogError("Request to end turn denied for " + player.playerName + ". It is not their turn.");
             return false;
         }
 
         if (StateManager.Instance.currentPhase != TurnPhase.WaitingForPlayerInput)
         {
-            Debug.LogError("It is not player's phase");
+            Debug.LogError("Request to end turn denied for " + player.playerName + ". It is not the correct phase.");
             return false;
         }
 
-        EndTurn();
+        Debug.Log("Request to end turn accepted for " + player.playerName);
+        EndCurrrentPlayersTurn();
 
         return true;
     }
@@ -249,30 +250,43 @@ public class TurnManager : MonoBehaviour
         // Check if player is allowed right now
         if (currentPlayer != player)
         {
-            Debug.LogError("It is not player's turn");
+            Debug.LogError("Request to dig denied for " + player.playerName + ". It is not their turn.");
             return false;
         }
 
         if (StateManager.Instance.currentPhase != TurnPhase.WaitingForPlayerInput)
         {
-            Debug.LogError("It is not player's phase");
+            Debug.LogError("Request to dig denied for " + player.playerName + ". It is not the correct phase.");
             //return false;
         }
 
         if(player.actionsLeft < 1)
         {
-            Debug.LogError("Not enough actions to dig");
+            Debug.LogError("Request to dig denied for " + player.playerName + ". Not enough actions left to dig.");
             return false;
         }
-        
-        player.ExecuteDig();
+
+        if(player.currentSpace.digSpot == null)
+        {
+            Debug.LogError("Request to dig denied for " + player.playerName + ". No digspot on current space.");
+            return false;
+        }
+        Debug.Log("Request to dig accepted for " + player.playerName);
+
+
+
 
         return true;
     }
 
+
+
+
     // This function will be called by the player scripts
-    private void EndTurn()
+    private void EndCurrrentPlayersTurn()
     {
+        StateManager.Instance.players[StateManager.Instance.currentPlayerIndex].actionsLeft = 0;
+
         currentTurnButtonBar.Hide();
         StateManager.Instance.currentPhase = TurnPhase.Ended;
 
@@ -299,7 +313,6 @@ public class TurnManager : MonoBehaviour
 
 
     #region FloodPhase
-
 
     IEnumerator FullFloodPhaseCoroutine()
     {

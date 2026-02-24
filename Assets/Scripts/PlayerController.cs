@@ -27,9 +27,10 @@ public abstract class PlayerController : MonoBehaviour
     public Inventory inventory;
     public DigSpot lastSuccessfulDigSpot = null;
     public bool aiSelectNewGoal = false; // A flag to let AI versions know that they need to recalculate their destination space
+    public bool localPause = false;
 
     public static Action<PlayerController, BoardSpace> playerMoving;
-
+    public static Action<PlayerController, DigSpot, int> rolledDieForDigging; // An event for CPU to respond to with shovels or fake gems, (player, digspot, die result)
 
     protected virtual void Awake()
     {
@@ -78,12 +79,7 @@ public abstract class PlayerController : MonoBehaviour
     public virtual void EndTurn()
     {
         actionsLeft = 0;
-        if (TurnManager.Instance.RequestToEndTurn(this))
-        {
-            Debug.Log("Request to end turn accepted");
-        }else{
-            Debug.Log("Request to end turn rejected");
-        }
+        TurnManager.Instance.RequestToEndTurn(this);
     }
 
 
@@ -152,12 +148,18 @@ public abstract class PlayerController : MonoBehaviour
         }
         // else I don't think other online player rolling functionality will be here, but idk yet
 
-
+        // This is a bandaid fix to just let the die rolling animation finish
         yield return new WaitForSeconds(1f);
 
 
-        // Wait for input/delay to allow for item usage
+
+        // Broadcast the result and allow other players and AI to respond with items.
+        rolledDieForDigging?.Invoke(this, digSpot, dieResult);
+
+        // Wait for input/delay to allow for item usage in response
         yield return TurnManager.Instance.WaitForInteruptsCoroutine(TurnManager.Instance.waitTime, null);
+
+
 
 
         // Complete dig result
@@ -165,10 +167,11 @@ public abstract class PlayerController : MonoBehaviour
         {
             lastSuccessfulDigSpot = digSpot; // Sets last digspot to prevent repeat digging
             Debug.Log("Player " + playerName + " successfully dug with a " + dieResult.ToString() + "!" );
-            aiSelectNewGoal = true;
+            aiSelectNewGoal = true;            
+
         }
         TurnManager.Instance.digButton.CompleteDig(); // Finishes the button animation
-   
+
     }
     public virtual void BuryStash(BoardSpace targetSpace, int[] gemsToBuryArray)
     {

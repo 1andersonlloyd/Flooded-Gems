@@ -31,17 +31,11 @@ public class AIController : PlayerController
     {
         base.StartTurn();
 
-        Debug.Log("Starting AI Turn");
+        Debug.Log("Starting AI Turn for " + playerName);
         StartCoroutine(AiControllerTurnCoroutine());
 
     }
     
-    public override void EndTurn()
-    {
-
-        base.EndTurn();
-    }
-
     IEnumerator AiControllerTurnCoroutine()
     {
         // For now just have the ai choose a new space to move towards each round randomly.
@@ -65,30 +59,30 @@ public class AIController : PlayerController
                 // Allows for waiting the flood out. The flood will trigger a new target space, which will break the target lock.
                 if(currentSpace == MapManager.Instance.greenSpace)
                 {
-                    EndTurn();
+                    if (TurnManager.Instance.RequestToEndTurn(this))
+                    {
+                        yield break;
+                    }
                 }
 
                 if(currentSpace.digSpot != null)
                 {
                     if (TurnManager.Instance.RequestToDig(this))
                     {
-                        Debug.Log("Player " + playerName + " dug at " + currentSpace.name);
+                        focusValue -= 1;
+                        yield return StartCoroutine(ExecuteDigCoroutine());
                     }
                 }
             }else{
                 moveTowardsDestination();
             }
         }
-        
-
-        EndTurn();
+            TurnManager.Instance.RequestToEndTurn(this);
     }
 
     public override void ExecuteDig()
     {
-        StartCoroutine(ExecuteDigCoroutine());
-        focusValue -= 1;
-        actionsLeft--;
+        base.ExecuteDig();
     }
 
     protected override IEnumerator ExecuteDigCoroutine()
@@ -156,7 +150,7 @@ public class AIController : PlayerController
             }
         }
 
-        Debug.Log("Gem Priority: " + gemPriority + " | Item Priority: " + itemPriority + " | Stash Priority: " + stashPriority + " | Green Priority: " + greenPriority);
+        //Debug.Log("Gem Priority: " + gemPriority + " | Item Priority: " + itemPriority + " | Stash Priority: " + stashPriority + " | Green Priority: " + greenPriority);
 
         // Start checking for specific things that impact priority
 
@@ -210,7 +204,7 @@ public class AIController : PlayerController
             greenPriority += 10000;
         }
 
-        Debug.Log("Gem Priority: " + gemPriority + " | Item Priority: " + itemPriority + " | Stash Priority: " + stashPriority + " | Green Priority: " + greenPriority);
+        //Debug.Log("Gem Priority: " + gemPriority + " | Item Priority: " + itemPriority + " | Stash Priority: " + stashPriority + " | Green Priority: " + greenPriority);
 
         // Assess flood risk and store each valid space into a dictionary for random weighted selection
         if(closestGemDigSpace && gemDistance.HasValue)
@@ -231,7 +225,7 @@ public class AIController : PlayerController
         greenPriority *= AssessRiskOfSpace(greenSpace);
         spaceWeights.Add(greenSpace, greenPriority);
 
-        Debug.Log("Gem Priority: " + gemPriority + " | Item Priority: " + itemPriority + " | Stash Priority: " + stashPriority + " | Green Priority: " + greenPriority);
+        //Debug.Log("Gem Priority: " + gemPriority + " | Item Priority: " + itemPriority + " | Stash Priority: " + stashPriority + " | Green Priority: " + greenPriority);
 
 
         // Randomly select based on final weights

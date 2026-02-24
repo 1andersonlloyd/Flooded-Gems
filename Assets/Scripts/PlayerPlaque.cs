@@ -58,7 +58,6 @@ public class PlayerPlaque : MonoBehaviour
     {
         plaqueImage.sprite = plaqueSprites[color];
         stashSprite.sprite = stashSprites[color];
-        Debug.Log(color + " ID");
     }
 
 #region GemsUI

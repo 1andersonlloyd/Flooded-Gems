@@ -3023,6 +3023,7 @@ MonoBehaviour:
   currentTurnButtonBar: {fileID: 2144916168}
   digButton: {fileID: 428027377}
   startingSpace: {fileID: 8879236803499140690}
+  actionsPerTurn: 3
   waitTime: 1
   waitInterrupted: 0
   interruptingPlayers: []
@@ -16879,6 +16880,7 @@ GameObject:
   - component: {fileID: 1407600063}
   - component: {fileID: 1407600066}
   - component: {fileID: 1407600065}
+  - component: {fileID: 1407600067}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -17044,6 +17046,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1407600058}
   m_CullTransparentMesh: 1
+--- !u!114 &1407600067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1407600058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87b8f4b2a75fe9a4e87d439a58f842a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1429111104
 PrefabInstance:
   m_ObjectHideFlags: 0
