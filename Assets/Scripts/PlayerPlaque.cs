@@ -23,14 +23,15 @@ public class PlayerPlaque : MonoBehaviour
     public PlayerController player;
 
 
-
-
     [SerializeField]
     protected List<Sprite> gemSprites;
     [SerializeField]
     protected List<Sprite> plaqueSprites;
     [SerializeField]
     protected List<Sprite> stashSprites;
+
+    [SerializeField]
+    protected DiceTray diceTray;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -108,5 +109,20 @@ public class PlayerPlaque : MonoBehaviour
         SetAllGemQuantity(gemArray);
         SetItemQuantity(itemCount);
     }
+
+
+    public void RollDie(int forcedValue)
+    {
+        diceTray.Show();
+        diceTray.RollDice(new List<int>{forcedValue});
+
+
+    }
+
+    public void HideDiceTray()
+    {
+        diceTray.Hide();
+    }
+
 
 }

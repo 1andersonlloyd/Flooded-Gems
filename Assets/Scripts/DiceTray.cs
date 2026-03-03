@@ -41,17 +41,18 @@ public class DiceTray : SlidingBar
         }
         base.InitializeValues();
     }
-    public List<int> RollDice(int numDice, List<int> forcedRolls)
+    public List<int> RollDice(List<int> forcedRolls)
     {
+        Show();
         List<int> results = new List<int> { };
-        if (dice.Length < numDice)
+        if (dice.Length < forcedRolls.Count)
         {
             Debug.LogError("Dice tray has less than required dice");
             return results;
         }
 
         int total = 0;
-        for (int i = 0; i < numDice; i++)
+        for (int i = 0; i < forcedRolls.Count; i++)
         {
             int forcedValue = 0;
 

@@ -37,8 +37,10 @@ public class DigButton : MonoBehaviour
 
     public int RollDie()
     {
-        diceTray.Show();
-        return diceTray.RollDice(1, new List<int> { })[0];
+        //diceTray.Show();
+
+        int dieResult = Random.Range(1, 7); //Probably not ideal to have this calculated here
+        return diceTray.RollDice(new List<int> {dieResult })[0];
     }
 
     public void CompleteDig()

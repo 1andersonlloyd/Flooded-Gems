@@ -17,7 +17,7 @@ public class TurnManager : MonoBehaviour
     public AIController aiPrefab;
     public PlayerPlaque playerPlaquePrefab;
     public RectTransform plaqueBar;
-    List<PlayerPlaque> playerPlaques = new List<PlayerPlaque>();
+    public List<PlayerPlaque> playerPlaques = new List<PlayerPlaque>();
     public ButtonBar currentTurnButtonBar;
     public DigButton digButton; 
 
@@ -34,6 +34,8 @@ public class TurnManager : MonoBehaviour
 
     public Dice die1;
     public Dice die2;
+
+    public static Action<PlayerController> startingPlayerTurn;
 
     // Delete ?
     public bool setLocalPlayerMoveEnabled(bool value)
@@ -96,27 +98,6 @@ public class TurnManager : MonoBehaviour
             return;
         }
 
-
-        // Creating the Player Plaque layouts
-        List<float> plaqueYCoords;
-        switch (numHumans + numAI)
-        {
-            case 2:
-                plaqueYCoords = new List<float> { 0.75f, 0.25f };
-
-            break;
-            case 3:
-                plaqueYCoords = new List<float> { 0.8333f, 0.5f, 0.1666f };
-            break;
-
-            case 4:
-                plaqueYCoords = new List<float> { 0.875f, 0.625f, 0.375f, 0.125f };
-            break;
-            default:
-                Debug.LogError("Unsupported number of players. " + numAI + numHumans + " players passed.");
-                return;
-        }
-
         // Add human players
         for (int i = 0; i < numHumans; i++)
         {
@@ -124,8 +105,7 @@ public class TurnManager : MonoBehaviour
             HumanController human = Instantiate(humanPrefab);
             human.InitializePlayer(name, startingSpace, playerNumIncrement++);
             StateManager.Instance.players.Add(human);
-            
-            AddPlayerPlaque(human, plaqueBar, plaqueYCoords[i], i);
+            UIManager.Instance.AddPlayerPlaque(human, numHumans + numAI,i);
 
 
             // TODO: For now just setting the first player as the local player
@@ -143,36 +123,9 @@ public class TurnManager : MonoBehaviour
             AIController ai = Instantiate(aiPrefab);
             ai.InitializePlayer(name, startingSpace, playerNumIncrement++);
             StateManager.Instance.players.Add(ai);
-            
-            AddPlayerPlaque(ai, plaqueBar, plaqueYCoords[i], i);
+            UIManager.Instance.AddPlayerPlaque(ai, numHumans + numAI,i);
         }
     }
-
-    void AddPlayerPlaque(PlayerController player, RectTransform rectTransform, float plaqueYCoord, int playerID)
-    {
-        // Instantiate plaque as a child of the rectTransform object
-        PlayerPlaque plaque = Instantiate(playerPlaquePrefab, rectTransform);
-        RectTransform plaqueRectTransform = plaque.GetComponent<RectTransform>();
-        plaqueRectTransform.anchorMax = new Vector2(0.5f, plaqueYCoord);
-        plaqueRectTransform.anchorMin = new Vector2(0.5f, plaqueYCoord);
-        playerPlaques.Add(plaque);
-        plaque.Initialize(player, playerID, player.playerName);
-    }
-
-    public PlayerPlaque GetPlayerPlaque(PlayerController player)
-    {
-        foreach(PlayerPlaque plaque in playerPlaques)
-        {
-            if(plaque.player == player)
-            {
-                return plaque;
-            }
-        }
-        Debug.LogError("Could not find plaque for player " + player.playerName);
-        return null;
-    }
-
-
 
     #endregion
 
@@ -180,10 +133,15 @@ public class TurnManager : MonoBehaviour
     // This function start the given player's turn
     public void StartTurn()
     {
+        // Show the action bar UI if the current player is the local player
         if (currentPlayer == StateManager.Instance.localPlayer)
         {
             currentTurnButtonBar.Show();
         }
+
+        // Send out event for turn start
+        startingPlayerTurn?.Invoke(currentPlayer);
+        // Trigger the start of the turn for the player directly
         StateManager.Instance.players[StateManager.Instance.currentPlayerIndex].StartTurn();
     }
     public bool RequestMove(PlayerController player, BoardSpace targetSpace)
@@ -320,30 +278,29 @@ public class TurnManager : MonoBehaviour
 
         Debug.Log("Starting Flood Phase");
 
-        floodThreatDiceTray.Show();
-
         // Calculate Flood Threat
-        List<int> results = floodThreatDiceTray.RollDice(2, new List<int>{});
+        List<int> threatResults = new List<int>{UnityEngine.Random.Range(1, 7), UnityEngine.Random.Range(1, 7)};
+        floodThreatDiceTray.RollDice(threatResults);
         
         yield return new WaitForSeconds(1.0f);
-        Debug.Log("Flood Threat Roll: " + results[0] + " + " + results[1] + " + " + FloodThreatScale.Instance.getFloodThreatModifier() +
-         " = " + (results[0] + results[1] + FloodThreatScale.Instance.getFloodThreatModifier()));
+        Debug.Log("Flood Threat Roll: " + threatResults[0] + " + " + threatResults[1] + " + " + FloodThreatScale.Instance.getFloodThreatModifier() +
+         " = " + (threatResults[0] + threatResults[1] + FloodThreatScale.Instance.getFloodThreatModifier()));
 
         // Wait for Interrupts
         yield return StartCoroutine(WaitForInteruptsCoroutine(waitTime, null));
 
         // React to threat result
         // Flood triggers
-        if (results[0] + results[1] + FloodThreatScale.Instance.getFloodThreatModifier() >= 12)
-        {
-            // Trigger Flood
-            floodReachDiceTray.Show();
+        if (threatResults[0] + threatResults[1] + FloodThreatScale.Instance.getFloodThreatModifier() >= 12)
+        {            
             // Roll flood dice
-            results = floodReachDiceTray.RollDice(2, new List<int>{});
+            List<int> floodResults = new List<int>{UnityEngine.Random.Range(1, 7), UnityEngine.Random.Range(1, 7)};
+            floodReachDiceTray.RollDice(new List<int>{});
+
             yield return new WaitForSeconds(1.0f);
 
-            BoardSpace.SpaceType floodReach = FloodThreatScale.getFloodReach(results[0] + results[1]);
-            Debug.Log("Flood Reach Roll: " + results[0] + " + " + results[1] + " = " + floodReach + " spaces reached");
+            BoardSpace.SpaceType floodReach = FloodThreatScale.getFloodReach(floodResults[0] + floodResults[1]);
+            Debug.Log("Flood Reach Roll: " + floodResults[0] + " + " + floodResults[1] + " = " + floodReach + " spaces reached");
 
             // Highlight flooded spaces
             MapManager.Instance.HighlightFloodedSpaces(floodReach, 0.1f);

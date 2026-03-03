@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1238187903534463055}
   - component: {fileID: 5881119528535681236}
   m_Layer: 0
-  m_Name: Highlight
+  m_Name: TravelIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -139,6 +139,7 @@ MonoBehaviour:
   spaceType: 0
   spriteRenderer: {fileID: 5881119528535681236}
   lineRenderer: {fileID: 7793767994433416837}
+  digSpot: {fileID: 0}
 --- !u!60 &8456472631188014641
 PolygonCollider2D:
   m_ObjectHideFlags: 0

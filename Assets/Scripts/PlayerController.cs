@@ -31,6 +31,7 @@ public abstract class PlayerController : MonoBehaviour
 
     public static Action<PlayerController, BoardSpace> playerMoving;
     public static Action<PlayerController, DigSpot, int> rolledDieForDigging; // An event for CPU to respond to with shovels or fake gems, (player, digspot, die result)
+    public static Action<PlayerController> finishedDigRoll;
 
     protected virtual void Awake()
     {
@@ -116,10 +117,9 @@ public abstract class PlayerController : MonoBehaviour
     public virtual void ExecuteDig()
     {
         Debug.Log("Digging for " + playerName);
-
+        actionsLeft--;
         StartCoroutine(ExecuteDigCoroutine());
 
-        actionsLeft--;
     }
 
     protected virtual IEnumerator ExecuteDigCoroutine()
@@ -136,17 +136,8 @@ public abstract class PlayerController : MonoBehaviour
         }
 
         // Roll die
-        int dieResult = 0;
-        if (StateManager.Instance.localPlayer == this) // Rolling die on UI for local player
-        {
-            dieResult = TurnManager.Instance.digButton.RollDie();
-        }else if(this is AIController)
-        {
-            // TODO: This is filler code to allow functionality. Ai players need an ui for rolling dice
-            dieResult = UnityEngine.Random.Range(1, 7);
-            // NOTE: Doing online functionality will require relegating this function only to the host instance. This might not be the perfect place for this note, but just remember it
-        }
-        // else I don't think other online player rolling functionality will be here, but idk yet
+        int dieResult = UnityEngine.Random.Range(1, 7);
+        UIManager.Instance.RollPlayerDie(this, dieResult);
 
         // This is a bandaid fix to just let the die rolling animation finish
         yield return new WaitForSeconds(1f);
@@ -171,6 +162,7 @@ public abstract class PlayerController : MonoBehaviour
 
         }
         TurnManager.Instance.digButton.CompleteDig(); // Finishes the button animation
+        finishedDigRoll?.Invoke(this);
 
     }
     public virtual void BuryStash(BoardSpace targetSpace, int[] gemsToBuryArray)

@@ -51,13 +51,13 @@ public class DigSpot : MonoBehaviour
             if (gemType != Inventory.GemType.None)
             {
                 player.inventory.AddGem(gemType);
-                FlyingItem.SpawnFlyingItem((int)gemType, transform.position, TurnManager.Instance.GetPlayerPlaque(player));
+                FlyingItem.SpawnFlyingItem((int)gemType, transform.position, UIManager.Instance.GetPlayerPlaque(player));
             }
             else
             {
                 Item item = generateItem();
                 player.inventory.AddItem(item);
-                FlyingItem.SpawnFlyingItem(6, transform.position, TurnManager.Instance.GetPlayerPlaque(player));
+                FlyingItem.SpawnFlyingItem(6, transform.position, UIManager.Instance.GetPlayerPlaque(player));
 
             }
         }
