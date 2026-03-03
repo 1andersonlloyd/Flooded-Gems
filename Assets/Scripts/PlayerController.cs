@@ -29,9 +29,9 @@ public abstract class PlayerController : MonoBehaviour
     public bool aiSelectNewGoal = false; // A flag to let AI versions know that they need to recalculate their destination space
     public bool localPause = false;
 
-    public static Action<PlayerController, BoardSpace> playerMoving;
-    public static Action<PlayerController, DigSpot, int> rolledDieForDigging; // An event for CPU to respond to with shovels or fake gems, (player, digspot, die result)
-    public static Action<PlayerController> finishedDigRoll;
+    public static Action<PlayerController, BoardSpace> PlayerMoving;
+    public static Action<PlayerController, DigSpot, int> RolledDieForDigging; // An event for CPU to respond to with shovels or fake gems, (player, digspot, die result)
+    public static Action<PlayerController> FinishedDigRoll;
 
     protected virtual void Awake()
     {
@@ -98,7 +98,7 @@ public abstract class PlayerController : MonoBehaviour
 
         actionsLeft -= path.Count - 1;
         
-        playerMoving?.Invoke(this, targetSpace);
+        PlayerMoving?.Invoke(this, targetSpace);
     }
 
     public virtual void ExecuteJump(BoardSpace targetSpace)
@@ -110,22 +110,15 @@ public abstract class PlayerController : MonoBehaviour
 
         // Update player's board space
         currentSpace = targetSpace;
-        playerMoving?.Invoke(this, targetSpace);
+        PlayerMoving?.Invoke(this, targetSpace);
 
     }
 
-    public virtual void ExecuteDig()
-    {
-        Debug.Log("Digging for " + playerName);
-        actionsLeft--;
-        StartCoroutine(ExecuteDigCoroutine());
-
-    }
-
+    // The coroutine that performs the dig, currently called by code in HumanController and AIController
     protected virtual IEnumerator ExecuteDigCoroutine()
     {
 
-        // Play animation for digging
+        // Play animation for digging?
 
         // Check for digspot
         DigSpot digSpot = currentSpace.GetDigSpot();
@@ -134,6 +127,14 @@ public abstract class PlayerController : MonoBehaviour
             Debug.Log("Error, no dig spot to dig");
             yield break;
         }
+        // Prevent repeatedly digging the same spot to farm items
+        if(digSpot == lastSuccessfulDigSpot)
+        {
+            Debug.LogError("Error, can't dig at a the spot you successfully dug at last");
+            yield break;
+        }
+
+        actionsLeft--;
 
         // Roll die
         int dieResult = UnityEngine.Random.Range(1, 7);
@@ -143,14 +144,11 @@ public abstract class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
 
-
         // Broadcast the result and allow other players and AI to respond with items.
-        rolledDieForDigging?.Invoke(this, digSpot, dieResult);
+        RolledDieForDigging?.Invoke(this, digSpot, dieResult);
 
         // Wait for input/delay to allow for item usage in response
         yield return TurnManager.Instance.WaitForInteruptsCoroutine(TurnManager.Instance.waitTime, null);
-
-
 
 
         // Complete dig result
@@ -161,8 +159,8 @@ public abstract class PlayerController : MonoBehaviour
             aiSelectNewGoal = true;            
 
         }
-        TurnManager.Instance.digButton.CompleteDig(); // Finishes the button animation
-        finishedDigRoll?.Invoke(this);
+        //TurnManager.Instance.digButton.CompleteDig(); // Finishes the button animation
+        FinishedDigRoll?.Invoke(this);
 
     }
     public virtual void BuryStash(BoardSpace targetSpace, int[] gemsToBuryArray)
@@ -185,12 +183,6 @@ public abstract class PlayerController : MonoBehaviour
 
         // TODO: Maybe this should be part of the UI? Unsure how much logic can be part of the UI.
     }
-
-
-    // TODO: I need a ton of simple logic functions for determining what actions are possible to be taken by the player
-
-
-
 }
 
 public class Inventory

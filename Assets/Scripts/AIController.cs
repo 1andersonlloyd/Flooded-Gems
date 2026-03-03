@@ -3,29 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using NUnit.Framework.Constraints;
 
 public class AIController : PlayerController
 {   
     
     public BoardSpace destinationSpace = null;
     int focusValue = 0;
-
-    protected override void Awake()
-    {
-        base.Awake();
-    }
-
-    protected override void Start()
-    {
-        base.Start();
-        
-    }
-
-    protected override void Update()
-    {
-        base.Update();
-    }
 
     public override void StartTurn()
     {
@@ -78,16 +61,6 @@ public class AIController : PlayerController
             }
         }
             TurnManager.Instance.RequestToEndTurn(this);
-    }
-
-    public override void ExecuteDig()
-    {
-        base.ExecuteDig();
-    }
-
-    protected override IEnumerator ExecuteDigCoroutine()
-    {
-        yield return base.ExecuteDigCoroutine();
     }
 
     // Logic for the ai to choose a new space it wants to move towards

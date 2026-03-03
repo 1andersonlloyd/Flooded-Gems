@@ -5,10 +5,12 @@ using UnityEngine.UI;
 
 public class DigButton : MonoBehaviour
 {
-    public DiceTray diceTray;
+    Color normalColor = Color.white;
+    Color disabledColor = new Color(128f/255f, 128f/255f, 128f/255f);
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private Image buttonImage;
+
+    void Awake()
     {
         // Get the Button component attached to this GameObject
         Button button = GetComponent<Button>();
@@ -16,35 +18,57 @@ public class DigButton : MonoBehaviour
         {
             button.onClick.AddListener(HandleClick);
         }
+        buttonImage = GetComponent<Image>();
 
+        PlayerController.PlayerMoving += OnPlayerMove;
+        PlayerController.FinishedDigRoll += OnPlayerFinishedDigRoll;
+        TurnManager.StartingPlayerTurn += OnStartingPlayerTurn;
     }
 
-    // Update is called once per frame
-    void Update()
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
     {
+    
 
     }
-
+    // Send the click request to the human local player to assess and perform
     private void HandleClick()
     {
-        if (TurnManager.Instance.RequestToDig(StateManager.Instance.localPlayer))
+        StateManager.Instance.localPlayer.DigButtonClicked();
+    }
+
+    void OnPlayerMove(PlayerController player, BoardSpace space)
+    {
+        if(player == StateManager.Instance.localPlayer)
         {
-            Debug.Log($"[{nameof(DigButton)}] Dig Request Accepted");
-            StateManager.Instance.localPlayer.ExecuteDig();
+            UpdateButtonVisuals();
+        }
+    }
+    void OnPlayerFinishedDigRoll(PlayerController player)
+    {
+        if(player == StateManager.Instance.localPlayer)
+        {
+            UpdateButtonVisuals();
+        }
+    }
+
+    void OnStartingPlayerTurn(PlayerController player)
+    {
+        if(player == StateManager.Instance.localPlayer)
+        {
+            UpdateButtonVisuals();
+        }
+    }
+    void UpdateButtonVisuals()
+    {
+        PlayerController player = StateManager.Instance.localPlayer;
+        if(player == null )
+        {
+            return;
         }
 
+        DigSpot currentDigSpot = player.currentSpace?.digSpot;
+        buttonImage.color = (currentDigSpot != null && currentDigSpot != player.lastSuccessfulDigSpot && player.actionsLeft > 0) ? normalColor : disabledColor;
     }
 
-    public int RollDie()
-    {
-        //diceTray.Show();
-
-        int dieResult = Random.Range(1, 7); //Probably not ideal to have this calculated here
-        return diceTray.RollDice(new List<int> {dieResult })[0];
-    }
-
-    public void CompleteDig()
-    {
-        diceTray.Hide();
-    }
 }

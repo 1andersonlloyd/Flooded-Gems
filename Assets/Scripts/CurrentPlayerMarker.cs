@@ -5,17 +5,17 @@ public class CurrentPlayerMarker : MonoBehaviour
 {       
     RectTransform rectTransform;
     // Dictionary<PlayerController, PlayerPlaque> playerPlaques = new Dictionary<PlayerController, PlayerPlaque>();
-    Vector2 targetPosition = Vector2.zero;
-    float offset;
+    public Vector2 targetPosition = Vector2.zero;
 
-
+    public void Awake()
+    {
+        TurnManager.StartingPlayerTurn += OnPlayerTurnStart;
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rectTransform = GetComponent<RectTransform>();
-     
-        TurnManager.startingPlayerTurn += OnPlayerTurnStart;
     }
 
     // Update is called once per frame

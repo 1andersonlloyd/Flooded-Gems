@@ -42,24 +42,6 @@ public class HumanController : PlayerController
         base.Update();
     }
 
-    public override void StartTurn()
-    {
-        base.StartTurn();
-
-
-        // Player should be able to end the turn based on UI or automatic check in a different spot
-    }
-
-    public override void EndTurn()
-    {
-
-
-
-
-        // Call base to end the turn officially
-        base.EndTurn();
-    }
-
     public void HandleSpaceClicked(BoardSpace space)
     {
         Debug.Log("Space clicked: " + space.name);
@@ -71,6 +53,16 @@ public class HumanController : PlayerController
         else
         {
             Debug.Log("Move Request was rejected");
+        }
+    }
+
+
+    public void DigButtonClicked()
+    {
+        if (TurnManager.Instance.RequestToDig(StateManager.Instance.localPlayer))
+        {
+            Debug.Log($"[{nameof(DigButton)}] Dig Request Accepted");
+            StartCoroutine(ExecuteDigCoroutine());
         }
     }
 

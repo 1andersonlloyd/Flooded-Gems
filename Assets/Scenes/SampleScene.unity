@@ -6598,6 +6598,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb3b888d128aa394fa0aac362690895f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetPosition: {x: 0, y: 0}
 --- !u!114 &680914939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23155,8 +23156,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9019829355026366567, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
+      propertyPath: m_Colors.m_DisabledColor.b
+      value: 0.21787111
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019829355026366567, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
+      propertyPath: m_Colors.m_DisabledColor.g
+      value: 0.21787111
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019829355026366567, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
+      propertyPath: m_Colors.m_DisabledColor.r
+      value: 0.9056604
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8366518888589599173, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89435236dfc899a408c0f1e136d75710, type: 3}

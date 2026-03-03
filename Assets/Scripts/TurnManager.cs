@@ -35,7 +35,7 @@ public class TurnManager : MonoBehaviour
     public Dice die1;
     public Dice die2;
 
-    public static Action<PlayerController> startingPlayerTurn;
+    public static Action<PlayerController> StartingPlayerTurn;
 
     // Delete ?
     public bool setLocalPlayerMoveEnabled(bool value)
@@ -138,11 +138,11 @@ public class TurnManager : MonoBehaviour
         {
             currentTurnButtonBar.Show();
         }
-
-        // Send out event for turn start
-        startingPlayerTurn?.Invoke(currentPlayer);
+        
         // Trigger the start of the turn for the player directly
         StateManager.Instance.players[StateManager.Instance.currentPlayerIndex].StartTurn();
+        // Send out event for turn start
+        StartingPlayerTurn?.Invoke(currentPlayer);
     }
     public bool RequestMove(PlayerController player, BoardSpace targetSpace)
     {
