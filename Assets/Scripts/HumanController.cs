@@ -45,7 +45,7 @@ public class HumanController : PlayerController
     public void HandleSpaceClicked(BoardSpace space)
     {
         Debug.Log("Space clicked: " + space.name);
-        if (moveInputEnabled && TurnManager.Instance.RequestMove(this, space))
+        if (moveInputEnabled && LocalGameManager.Instance.RequestMove(this, space))
         {
             MoveButton.Instance.DisableMove();
             Debug.Log("Move Request was accepted");
@@ -59,7 +59,7 @@ public class HumanController : PlayerController
 
     public void DigButtonClicked()
     {
-        if (TurnManager.Instance.RequestToDig(StateManager.Instance.localPlayer))
+        if (LocalGameManager.Instance.RequestToDig(LocalGameManager.Instance.localPlayer))
         {
             Debug.Log($"[{nameof(DigButton)}] Dig Request Accepted");
             StartCoroutine(ExecuteDigCoroutine());

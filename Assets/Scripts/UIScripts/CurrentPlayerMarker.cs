@@ -9,7 +9,7 @@ public class CurrentPlayerMarker : MonoBehaviour
 
     public void Awake()
     {
-        TurnManager.StartingPlayerTurn += OnPlayerTurnStart;
+        LocalGameManager.StartingPlayerTurn += OnPlayerTurnStart;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

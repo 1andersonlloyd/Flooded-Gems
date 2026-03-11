@@ -42,7 +42,7 @@ public class AIController : PlayerController
                 // Allows for waiting the flood out. The flood will trigger a new target space, which will break the target lock.
                 if(currentSpace == MapManager.Instance.greenSpace)
                 {
-                    if (TurnManager.Instance.RequestToEndTurn(this))
+                    if (LocalGameManager.Instance.RequestToEndTurn(this))
                     {
                         yield break;
                     }
@@ -50,7 +50,7 @@ public class AIController : PlayerController
 
                 if(currentSpace.digSpot != null)
                 {
-                    if (TurnManager.Instance.RequestToDig(this))
+                    if (LocalGameManager.Instance.RequestToDig(this))
                     {
                         focusValue -= 1;
                         yield return StartCoroutine(ExecuteDigCoroutine());
@@ -60,7 +60,7 @@ public class AIController : PlayerController
                 moveTowardsDestination();
             }
         }
-            TurnManager.Instance.RequestToEndTurn(this);
+            LocalGameManager.Instance.RequestToEndTurn(this);
     }
 
     // Logic for the ai to choose a new space it wants to move towards
@@ -261,7 +261,7 @@ public class AIController : PlayerController
             }
 
         // Put in the request to move
-        return TurnManager.Instance.RequestMove(this, targetNeighbor);
+        return LocalGameManager.Instance.RequestMove(this, targetNeighbor);
     }
 
 

@@ -73,14 +73,14 @@ public abstract class PlayerController : MonoBehaviour
     public virtual void StartTurn()
     {
         Debug.Log("Starting Turn for " + playerName);
-        actionsLeft = TurnManager.Instance.actionsPerTurn;
+        actionsLeft = LocalGameManager.Instance.actionsPerTurn;
         StateManager.Instance.currentPhase = TurnPhase.WaitingForPlayerInput;
     }
 
     public virtual void EndTurn()
     {
         actionsLeft = 0;
-        TurnManager.Instance.RequestToEndTurn(this);
+        LocalGameManager.Instance.RequestToEndTurn(this);
     }
 
 
@@ -148,7 +148,7 @@ public abstract class PlayerController : MonoBehaviour
         RolledDieForDigging?.Invoke(this, digSpot, dieResult);
 
         // Wait for input/delay to allow for item usage in response
-        yield return TurnManager.Instance.WaitForInteruptsCoroutine(TurnManager.Instance.waitTime, null);
+        yield return LocalGameManager.Instance.WaitForInteruptsCoroutine(LocalGameManager.Instance.waitTime, null);
 
 
         // Complete dig result

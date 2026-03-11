@@ -2802,6 +2802,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5a3f66484c46f64b8a0957d6255d126, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  localPlayer: {fileID: 0}
   humanPrefab: {fileID: 3415394972697460555, guid: 53e9954dbedb4d84fa61c89448361a6e, type: 3}
   aiPrefab: {fileID: -3006103538239709620, guid: 1ba50a1f3f5d84346bd731ca40d25aa9, type: 3}
   playerPlaquePrefab: {fileID: 2994643988605037971, guid: 209f463142d713b45893c4ae26c89c77, type: 3}
@@ -2848,7 +2849,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentThreatIncrement: 0
   players: []
-  localPlayer: {fileID: 0}
   currentPlayerIndex: 0
   currentPhase: 0
 --- !u!1001 &338262867
@@ -4820,7 +4820,7 @@ PrefabInstance:
       objectReference: {fileID: 3184228364265915780, guid: 9749347623e5dd14cad08e7f77397d48, type: 3}
     - target: {fileID: 6938253170395619595, guid: 5da9c34ae18e77c47a7d5a29a64f0799, type: 3}
       propertyPath: m_Name
-      value: Button
+      value: Hey Button
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7426,6 +7426,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 730559914}
   m_CullTransparentMesh: 1
+--- !u!1 &732080060 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2278418609634923172, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
+  m_PrefabInstance: {fileID: 7442048877052231006}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &732080065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 732080060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c80b1a7369774344bbfe0c8b4dc2d15a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &738438546
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16424,6 +16441,7 @@ MonoBehaviour:
   playerPlaqueBar: {fileID: 1348213923}
   playerPlaquePrefab: {fileID: 2994643988605037971, guid: 209f463142d713b45893c4ae26c89c77, type: 3}
   playerPlaques: []
+  activeButton: {fileID: 0}
 --- !u!1001 &1429111104
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23072,6 +23090,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1407600062}
     m_Modifications:
+    - target: {fileID: 2278418609634923172, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
+      propertyPath: m_Name
+      value: StashButton
+      objectReference: {fileID: 0}
     - target: {fileID: 3894270036255951171, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
       propertyPath: m_Name
       value: ActionBarYellowImage
@@ -23156,6 +23178,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7499017397999159594, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9019829355026366567, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9019829355026366567, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
       propertyPath: m_Colors.m_DisabledColor.b
       value: 0.21787111
@@ -23172,7 +23202,10 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 8366518888589599173, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2278418609634923172, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 732080065}
   m_SourcePrefab: {fileID: 100100000, guid: 89435236dfc899a408c0f1e136d75710, type: 3}
 --- !u!1001 &7648399577468145249
 PrefabInstance:

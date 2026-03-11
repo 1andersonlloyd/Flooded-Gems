@@ -5,23 +5,18 @@ public class MoveButton : MonoBehaviour
 {
     Button button;
     public static MoveButton Instance;
-    private Image buttonImage;
-
-    public Color normalColor = Color.white;
-    public Color pressedColor = Color.red;
-
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         Instance = this;
-        // Get the Image component attached to this GameObject
-        buttonImage = GetComponent<Image>();
-        // Set the initial color of the button
-        UpdateButtonVisual();
-        // Get the Button component attached to this GameObject
         button = GetComponent<Button>();
+        UIManager.Instance.SetButtonColors(button);
+        
         button.onClick.AddListener(HandleClick);
+        PlayerController.PlayerMoving += PlayerMovingListener;
+        UIManager.UpdateAllButtonVisuals += UpdateButtonVisuals;
+        UpdateButtonVisuals();
     }
     // Update is called once per frame
     void Update()
@@ -33,7 +28,7 @@ public class MoveButton : MonoBehaviour
         Debug.Log("Button clicked!");
 
         // Check StateManager to see if current player is local player
-        if (StateManager.Instance.localPlayer != TurnManager.Instance.currentPlayer)
+        if (LocalGameManager.Instance.localPlayer != LocalGameManager.Instance.currentPlayer)
         {
             Debug.Log("Not local player's turn!");
 
@@ -48,11 +43,14 @@ public class MoveButton : MonoBehaviour
 
     public void EnableMove()
     {
-        if (StateManager.Instance.localPlayer != null)
+        if (LocalGameManager.Instance.localPlayer != null)
         {
-            HumanController localPlayer = StateManager.Instance.localPlayer;
+            HumanController localPlayer = LocalGameManager.Instance.localPlayer;
             localPlayer.moveInputEnabled = true;
-            UpdateButtonVisual();
+
+            UIManager.Instance.ClaimActiveButton(button);
+
+            UpdateButtonVisuals();
             MapManager.Instance.ClearHighlights();
             MapManager.Instance.HighlightNeighborsInRadius(localPlayer.currentSpace, localPlayer.actionsLeft);
             MapManager.Instance.displayHoverSprites = true;
@@ -65,12 +63,15 @@ public class MoveButton : MonoBehaviour
 
     public void DisableMove()
     {
-        if (StateManager.Instance.localPlayer != null)
+        if (LocalGameManager.Instance.localPlayer != null)
         {
-            StateManager.Instance.localPlayer.moveInputEnabled = false;
-            UpdateButtonVisual();
-            MapManager.Instance.ClearHighlights();
-            MapManager.Instance.DisableSprites();
+            if(LocalGameManager.Instance.localPlayer.moveInputEnabled){
+                LocalGameManager.Instance.localPlayer.moveInputEnabled = false;
+                UIManager.Instance.ReleaseActiveButton(button);
+                UpdateButtonVisuals();
+                MapManager.Instance.ClearHighlights();
+                MapManager.Instance.DisableSprites();
+            }
         }
         else
         {
@@ -80,9 +81,9 @@ public class MoveButton : MonoBehaviour
 
     public void ToggleMove()
     {
-        if (StateManager.Instance.localPlayer != null)
+        if (LocalGameManager.Instance.localPlayer != null)
         {
-            if (StateManager.Instance.localPlayer.moveInputEnabled)
+            if (LocalGameManager.Instance.localPlayer.moveInputEnabled)
             {
                 DisableMove();
             }
@@ -99,11 +100,18 @@ public class MoveButton : MonoBehaviour
         }
     }
 
-    public void UpdateButtonVisual()
+    void PlayerMovingListener(PlayerController player, BoardSpace space)
     {
-        if (buttonImage != null && StateManager.Instance.localPlayer != null)
+        if(player == LocalGameManager.Instance.localPlayer)
         {
-            buttonImage.color = StateManager.Instance.localPlayer.moveInputEnabled ? pressedColor : normalColor;
+            UpdateButtonVisuals();
+        }
+    }
+    public void UpdateButtonVisuals()
+    {
+        if (button != null && LocalGameManager.Instance.localPlayer != null)
+        {
+            button.interactable = LocalGameManager.Instance.localPlayer.actionsLeft > 0 && UIManager.Instance.ActiveButtonCheck(button);
         }
     }
 }

@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -14,6 +16,13 @@ public class UIManager : MonoBehaviour
     public List<PlayerPlaque> playerPlaques = new List<PlayerPlaque>();
     Dictionary<PlayerController, PlayerPlaque> plaqueDictionary = new Dictionary<PlayerController, PlayerPlaque>();
 
+    Color normalColor = Color.white;
+    Color pressedColor = Color.gray;
+    Color disabledColor = new Color(128f/255f, 128f/255f, 128f/255f);
+    public Button activeButton = null;
+    public static Action UpdateAllButtonVisuals;
+
+#region Initialization
     void Awake()
     {
         if(Instance == null)
@@ -21,6 +30,9 @@ public class UIManager : MonoBehaviour
             Instance = this;
         }
         Canvas = GetComponent<Canvas>();
+        PlayerController.PlayerMoving += OnPlayerMove;
+        PlayerController.FinishedDigRoll += OnPlayerFinishedDigRoll;
+        LocalGameManager.StartingPlayerTurn += OnStartingPlayerTurn;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -64,7 +76,8 @@ public class UIManager : MonoBehaviour
         // Add plaque to the dictionary for easier lookup
         plaqueDictionary.Add(player, plaque);
     }
-
+#endregion Initialization
+#region Plaque Actions
     public PlayerPlaque GetPlayerPlaque(PlayerController player)
     {
         foreach(PlayerPlaque plaque in playerPlaques)
@@ -89,4 +102,69 @@ public class UIManager : MonoBehaviour
     {
         plaqueDictionary[player].HideDiceTray();
     }
+
+#endregion Plaque Actions
+#region Button Logic
+    void OnPlayerMove(PlayerController player, BoardSpace space)
+    {
+        if(player == LocalGameManager.Instance.localPlayer)
+        {
+            UpdateAllButtonVisuals?.Invoke();
+        }
+    }
+    void OnPlayerFinishedDigRoll(PlayerController player)
+    {
+        if(player == LocalGameManager.Instance.localPlayer)
+        {
+            UpdateAllButtonVisuals?.Invoke();
+        }
+    }
+    void OnStartingPlayerTurn(PlayerController player)
+    {
+        if(player == LocalGameManager.Instance.localPlayer)
+        {
+            UpdateAllButtonVisuals?.Invoke();
+        }
+    }
+    public void SetButtonColors(Button button)
+    {
+        ColorBlock colorBlock = button.colors;
+        colorBlock.normalColor = normalColor;
+        colorBlock.pressedColor = pressedColor;
+        colorBlock.disabledColor = disabledColor;
+        button.colors = colorBlock;
+    }
+
+    public void ClaimActiveButton(Button button)
+    {
+        if(activeButton == null)
+        {
+            activeButton = button;
+            UpdateAllButtonVisuals?.Invoke();
+        }
+        else
+        {
+            Debug.LogError("Cannot claim active button state for " + button.name + ". Button " + activeButton.name + " is already claiming the state.");
+        }
+    }
+    public void ReleaseActiveButton(Button button)
+    {
+        if(activeButton == button)
+        {
+            activeButton = null;
+            UpdateAllButtonVisuals?.Invoke();
+        }
+        else
+        {
+            Debug.LogError("Cannot release active button state for " + button.name + ", it does not have claim over it right now.");
+        }
+    }
+
+
+    // Checks to see if the passed button is allowed to be active by seeing if the active button is null or equals the passed button
+    public bool ActiveButtonCheck(Button button)
+    {
+        return button == activeButton || activeButton == null;
+    }
+#endregion Button Logic
 }

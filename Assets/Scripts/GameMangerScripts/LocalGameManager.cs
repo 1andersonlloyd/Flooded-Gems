@@ -4,15 +4,20 @@ using System.Collections;
 using System;
 using Unity.VisualScripting;
 
-// NOTE: I will be implementing a host sand client based system. This means that the host will perform all calcuations and processes
-// and the remote players will be basically input machines that send their requested action to the host. The host will do the stuff, and then tell the remote
-// players how to update their board.
 
+// This is the class responsible for managing the highest level of logic and control on a specific instance of the game.
+// This class however will not be allowed to update most of its data directly, merely acting as a form of UIManager.
+// It is not however responsible for making logic decisions for the state and must instead be the one to make requests to the HostGameManager through the NetworkManager
+// This class should be prepared to send requests to the HostGameManager through the NetworkManager and recieve game state updates through the same path.
+// This class will not know if the machine it is on is the host or not, and it must still communicate with the HostGameManager as if it was on a different system.
+// If this instance is on the host's machine, it will be the source of game state data for the HostGameManager directly and must be prepared to share all relevant data.
+// May need to implement a lock system to prevent the host from reading data at the same time it's being updated,
+//  or consider making a GameState struct that has ALL important data and sending when the host asks
 
-
-public class TurnManager : MonoBehaviour
+public class LocalGameManager : MonoBehaviour
 {
-    public static TurnManager Instance { get; private set; }
+    public static LocalGameManager Instance { get; private set; }
+    public HumanController localPlayer;
     public HumanController humanPrefab;
     public AIController aiPrefab;
     public PlayerPlaque playerPlaquePrefab;
@@ -40,11 +45,11 @@ public class TurnManager : MonoBehaviour
     // Delete ?
     public bool setLocalPlayerMoveEnabled(bool value)
     {
-        if (StateManager.Instance.localPlayer == null)
+        if (localPlayer == null)
         {
             return false;
         }
-        StateManager.Instance.localPlayer.moveInputEnabled = value;
+        localPlayer.moveInputEnabled = value;
         return true;
     }
 
@@ -52,7 +57,7 @@ public class TurnManager : MonoBehaviour
     {
         get
         {
-            return StateManager.Instance.players[StateManager.Instance.currentPlayerIndex];
+            return StateManager.Instance.players[StateManager.Instance.currentPlayerIndex]; // Probably change to host check
         }
     }
 
@@ -111,7 +116,7 @@ public class TurnManager : MonoBehaviour
             // TODO: For now just setting the first player as the local player
             if (i == 0)
             {
-                StateManager.Instance.localPlayer = human;
+                localPlayer = human;
             }
 
         }
@@ -134,7 +139,7 @@ public class TurnManager : MonoBehaviour
     public void StartTurn()
     {
         // Show the action bar UI if the current player is the local player
-        if (currentPlayer == StateManager.Instance.localPlayer)
+        if (currentPlayer == localPlayer)
         {
             currentTurnButtonBar.Show();
         }
@@ -249,7 +254,7 @@ public class TurnManager : MonoBehaviour
         StateManager.Instance.currentPhase = TurnPhase.Ended;
 
         // Update local player specific stuff
-        if (currentPlayer == StateManager.Instance.localPlayer)
+        if (currentPlayer == localPlayer)
         {
             MoveButton.Instance.DisableMove();
         }

@@ -30,19 +30,19 @@ public class PriorityButton : MonoBehaviour
         if (!holdingInterrupt)
         {
             holdingInterrupt = true;
-            TurnManager.Instance.AddPlayerToInterruptList(StateManager.Instance.localPlayer);
+            LocalGameManager.Instance.AddPlayerToInterruptList(LocalGameManager.Instance.localPlayer);
         }
         else
         {
             holdingInterrupt = false;
-            TurnManager.Instance.RemovePlayerFromInterruptList(StateManager.Instance.localPlayer);
+            LocalGameManager.Instance.RemovePlayerFromInterruptList(LocalGameManager.Instance.localPlayer);
         }
     }
 
 
     public void UpdateButtonVisual()
     {
-        if (buttonImage != null && StateManager.Instance.localPlayer != null)
+        if (buttonImage != null && LocalGameManager.Instance.localPlayer != null)
         {
             buttonImage.color = holdingInterrupt ? pressedColor : normalColor;
         }

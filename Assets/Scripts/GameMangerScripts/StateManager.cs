@@ -10,6 +10,10 @@ public enum TurnPhase
     FloodCutscene,
     FloodInterrupted
 }
+
+// This class will probably be the base of what becomes the HostGameManager class
+
+
 public class StateManager : MonoBehaviour
 {
     public static StateManager Instance;
@@ -19,7 +23,6 @@ public class StateManager : MonoBehaviour
     public int currentThreatIncrement = 0;
 
     public List<PlayerController> players = new List<PlayerController>();
-    public HumanController localPlayer;
     public int currentPlayerIndex = 0;
     public TurnPhase currentPhase = TurnPhase.WaitingForPlayerInput;
 
