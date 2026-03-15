@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -8,7 +9,7 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance;
     public static Canvas Canvas;
 
-    public GameObject actionBar;
+    public ButtonBar actionBar;
     public FloodThreatScale floodThreatScale;
 
     public RectTransform playerPlaqueBar;
@@ -21,6 +22,11 @@ public class UIManager : MonoBehaviour
     Color disabledColor = new Color(128f/255f, 128f/255f, 128f/255f);
     public Button activeButton = null;
     public static Action UpdateAllButtonVisuals;
+
+
+    public WaitIndicator waitIndicator;
+    public DiceTray floodThreatDiceTray;
+    public DiceTray floodReachDiceTray;
 
 #region Initialization
     void Awake()
@@ -39,7 +45,10 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         PlayerController.FinishedDigRoll += HidePlayerPlaqueDiceTray;
-
+        PlayerController.FinishedStashing += OnPlayerFinishedStashing;
+        LocalGameManager.StartingPlayerTurn += OnPlayerTurnStart;
+        LocalGameManager.EndingPlayerTurn += OnPlayerTurnEnding;
+        DigSpot.PlayerStashDestroyed += OnPlayerStashDestroyed;
     }
 
     public void AddPlayerPlaque(PlayerController player, int numberPlayers, int playerID)
@@ -119,6 +128,13 @@ public class UIManager : MonoBehaviour
             UpdateAllButtonVisuals?.Invoke();
         }
     }
+    void OnPlayerFinishedStashing(PlayerController player)
+    {
+        if(player == LocalGameManager.Instance.localPlayer)
+        {
+            UpdateAllButtonVisuals?.Invoke();
+        }
+    }
     void OnStartingPlayerTurn(PlayerController player)
     {
         if(player == LocalGameManager.Instance.localPlayer)
@@ -167,4 +183,49 @@ public class UIManager : MonoBehaviour
         return button == activeButton || activeButton == null;
     }
 #endregion Button Logic
+
+
+    public void SetWaitIndicatorPercentage(float percent)
+    {
+        waitIndicator.SetPercentage(percent);
+    }
+
+
+
+    public void RollFloodThreatDice(List<int> threatResults)
+    {
+        floodThreatDiceTray.RollDice(threatResults);
+
+    }
+    public void RollFloodReachDice(List<int> reachResults)
+    {
+        floodReachDiceTray.RollDice(reachResults);
+    }
+    public void HideFloodDiceTrays()
+    {
+        floodReachDiceTray.Hide();
+        floodThreatDiceTray.Hide();
+    }
+
+
+    void OnPlayerTurnStart(PlayerController player)
+    {
+        if(player == LocalGameManager.Instance.localPlayer)
+        {
+            actionBar.Show();
+        }
+    }
+
+    void OnPlayerTurnEnding(PlayerController player)
+    {
+        if(player == LocalGameManager.Instance.localPlayer)
+        {
+            actionBar.Hide();
+        }
+    }
+
+    void OnPlayerStashDestroyed(){
+        UpdateAllButtonVisuals?.Invoke();
+    }
+
 }

@@ -17,7 +17,8 @@ public class MapManager : MonoBehaviour
     public BoardSpace greenSpace;
 
     public List<PlayerController> players;
-
+    public DigSpot digSpotPrefab;
+    public List<Sprite> stashSprites;
 
     private void Awake()
     {
@@ -41,7 +42,7 @@ public class MapManager : MonoBehaviour
     void Start()
     {
         PlayerController.PlayerMoving += OnPlayerMove;
-        players = StateManager.Instance.players;
+        players = LocalGameManager.Instance.players;
         ShiftPlayersOnSpace();
     }
 
@@ -229,6 +230,15 @@ public class MapManager : MonoBehaviour
         Debug.Log("Found " + digSpotSpaces.Count + " dig spot spaces and stored the list");
     }
 
+    public DigSpot AddStashDigSpot(PlayerController player, int[] gemArray, BoardSpace space)
+    {
+        // Instantiate a digSpot at the space as a child of the board space
+        DigSpot stash = Instantiate(digSpotPrefab, space.transform.position, Quaternion.identity, space.transform);
+        stash.InitializeStashSpot(player, gemArray);
+        space.digSpot = stash;
+        digSpotSpaces.Add(space);
+        return stash;
+    }
 
     void OnPlayerMove(PlayerController player, BoardSpace targetSpace)
     {

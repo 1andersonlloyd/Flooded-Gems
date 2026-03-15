@@ -37,7 +37,7 @@ public class DigButton : MonoBehaviour
         }
 
         DigSpot currentDigSpot = player.currentSpace?.digSpot;
-        button.interactable = currentDigSpot != null && currentDigSpot != player.lastSuccessfulDigSpot && player.actionsLeft > 0 && UIManager.Instance.ActiveButtonCheck(button);
+        button.interactable = currentDigSpot != null && (currentDigSpot != player.lastSuccessfulDigSpot || currentDigSpot == player.stashSpot) && player.actionsLeft > 0 && UIManager.Instance.ActiveButtonCheck(button);
     }
 
 }

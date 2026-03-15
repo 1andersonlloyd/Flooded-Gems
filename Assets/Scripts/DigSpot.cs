@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.Events;
+using System;
+
 
 public class DigSpot : MonoBehaviour
 {
@@ -12,6 +15,12 @@ public class DigSpot : MonoBehaviour
 
     public enum DigSpotType { GemSpot, ItemSpot, StashSpot}
     public DigSpotType digSpotType;
+    public static Action PlayerStashDestroyed;
+
+    PlayerController stashOwner = null;
+    int[] stashContents = null;
+    BoardSpace space = null;
+
 
     public List<WeightedLootEntry> lootTable = new List<WeightedLootEntry>
     {
@@ -23,23 +32,57 @@ public class DigSpot : MonoBehaviour
 
     void Start()
     {
-        if(gemType != Inventory.GemType.None)
-        {
-            digSpotType = DigSpotType.GemSpot;
+        if(digSpotType != DigSpotType.StashSpot){
+            if(gemType != Inventory.GemType.None)
+            {
+                digSpotType = DigSpotType.GemSpot;
+            }
+            else
+            {
+                digSpotType = DigSpotType.ItemSpot;
+            } 
         }
-        else
-        {
-            digSpotType = DigSpotType.ItemSpot;
-        } //NOTE: This doesn't currently account for stash spots, but that might be fine as long as you remember this sets the values
-
     }
+    // Updates text in editor
     void OnValidate()
     {
         textMeshRenderer.text = rollGoal.ToString();
     } 
 
-    public bool Dig(PlayerController player, int rollValue)
+    public void InitializeStashSpot(PlayerController player, int[] gemArray)
     {
+        digSpotType = DigSpotType.StashSpot;
+        stashOwner = player;
+        rollGoal = 6;
+        stashContents = gemArray;
+        spriteRenderer.sprite = MapManager.Instance.stashSprites[(int)player.playerColor];
+
+
+        // TODO: Spawn the flying gem images
+
+    }
+
+
+
+    public virtual bool Dig(PlayerController player, int rollValue)
+    {
+        // If the stash owner digs their own stash
+        if(digSpotType == DigSpotType.StashSpot && stashOwner != null && stashOwner == player)
+        {
+            player.inventory.AddGemArray(stashContents);
+            for(int i = 0; i < stashContents.Length; i++)
+            {
+                for(int j = 0; j < stashContents[i]; j++)
+                {
+                    FlyingItem.SpawnFlyingItem(i, transform.position, UIManager.Instance.GetPlayerPlaque(player));
+                }
+            }
+            DestroyStash();
+            return true;
+        }
+     
+
+
         if (rollValue < rollGoal)
         {
             Debug.Log("Failed to dig, " + player.playerName + " rolled " + rollValue + " against goal of " + rollGoal);
@@ -48,17 +91,58 @@ public class DigSpot : MonoBehaviour
         else
         {
             Debug.Log("Successfully dug, " + player.playerName + " rolled " + rollValue + " against goal of " + rollGoal);
-            if (gemType != Inventory.GemType.None)
-            {
+            // GemSpot dig
+            if(digSpotType == DigSpotType.GemSpot){
                 player.inventory.AddGem(gemType);
                 FlyingItem.SpawnFlyingItem((int)gemType, transform.position, UIManager.Instance.GetPlayerPlaque(player));
             }
-            else
+            // ItemSpot dig
+            else if(digSpotType == DigSpotType.ItemSpot)
             {
                 Item item = generateItem();
                 player.inventory.AddItem(item);
                 FlyingItem.SpawnFlyingItem(6, transform.position, UIManager.Instance.GetPlayerPlaque(player));
+            }
+            // StashSpot dig
+            else if(digSpotType == DigSpotType.StashSpot)
+            {
+                // Get the index of a random gem type from the stashContents array that has a value of >0
+                if(stashContents != null)
+                {
+                    List<int> validIndexes = new List<int>();
+                    for(int i = 0; i < stashContents.Length; i++)
+                    {
+                        if(stashContents[i] > 0)
+                        {
+                            validIndexes.Add(i);
+                        }
+                    }
+                    int index = UnityEngine.Random.Range(0, validIndexes.Count);
+                    stashContents[index]--;
+                    player.inventory.AddGem((Inventory.GemType)index);
+                    FlyingItem.SpawnFlyingItem(index, transform.position, UIManager.Instance.GetPlayerPlaque(player));
 
+                    // If the stash is empty, destroy the stash
+                    bool empty = true;
+                    for(int i = 0; i < stashContents.Length; i++)
+                    {
+                        if(stashContents[i] > 0)
+                        {
+                            empty = false;
+                        }
+                    }
+                    if(empty)
+                    {
+                        DestroyStash();
+                    }
+
+                }
+            }
+            // Invalid dig type
+            else
+            {
+                Debug.LogError("Somehow tried to dig a spot with an invalid digSpotType");
+                return false;
             }
         }
         return true;
@@ -73,7 +157,7 @@ public class DigSpot : MonoBehaviour
             totalWeight += entry.weight;
         }
 
-        float randomWeight = Random.Range(0.0f, totalWeight);
+        float randomWeight = UnityEngine.Random.Range(0.0f, totalWeight);
         float currentWeight = 0.0f;
         foreach (WeightedLootEntry entry in lootTable)
         {
@@ -84,6 +168,18 @@ public class DigSpot : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public void DestroyStash()
+    {
+        Debug.Log("Destroying stash");
+        stashOwner.stashSpot = null;
+        // Get the parent object
+        BoardSpace space = GetComponentInParent<BoardSpace>();
+        space.digSpot = null;
+        PlayerStashDestroyed?.Invoke();
+        MapManager.Instance.ShiftPlayersOnSpace();
+        Destroy(gameObject);
     }
 }
 

@@ -16,11 +16,6 @@ public class FlyingItem : MonoBehaviour
     bool invUpdated = false;
     Inventory inventory;
 
-    void Awake()
-    {
-        
-    }
-
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void Init()
     {
@@ -68,6 +63,7 @@ public class FlyingItem : MonoBehaviour
 
             if (wait < 0){
                 Destroy(gameObject);
+                
             }
         }
     }

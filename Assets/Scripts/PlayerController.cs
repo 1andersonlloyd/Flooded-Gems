@@ -26,12 +26,14 @@ public abstract class PlayerController : MonoBehaviour
     float moveSpeed = 20f;
     public Inventory inventory;
     public DigSpot lastSuccessfulDigSpot = null;
+    public DigSpot stashSpot = null;
     public bool aiSelectNewGoal = false; // A flag to let AI versions know that they need to recalculate their destination space
     public bool localPause = false;
 
     public static Action<PlayerController, BoardSpace> PlayerMoving;
     public static Action<PlayerController, DigSpot, int> RolledDieForDigging; // An event for CPU to respond to with shovels or fake gems, (player, digspot, die result)
     public static Action<PlayerController> FinishedDigRoll;
+    public static Action<PlayerController> FinishedStashing;
 
     protected virtual void Awake()
     {
@@ -74,7 +76,7 @@ public abstract class PlayerController : MonoBehaviour
     {
         Debug.Log("Starting Turn for " + playerName);
         actionsLeft = LocalGameManager.Instance.actionsPerTurn;
-        StateManager.Instance.currentPhase = TurnPhase.WaitingForPlayerInput;
+        LocalGameManager.Instance.currentPhase = TurnPhase.WaitingForPlayerInput;
     }
 
     public virtual void EndTurn()
@@ -163,7 +165,7 @@ public abstract class PlayerController : MonoBehaviour
         FinishedDigRoll?.Invoke(this);
 
     }
-    public virtual void BuryStash(BoardSpace targetSpace, int[] gemsToBuryArray)
+    public virtual IEnumerator BuryStashCoroutine(int[] gemsToBuryArray)
     {
         Debug.Log("Burying Stash for " + playerName);
         // Double check for gems in inventory
@@ -174,7 +176,32 @@ public abstract class PlayerController : MonoBehaviour
 
         // Transfer gems from invetory to stash
 
+
+
+        // Make sure that current gem inventory array has enough gems for what is being removed
+        int[] gemArray = inventory.GetGemArray();
+        if(gemArray == null)
+        {
+            Debug.LogError("Error, failed to get inventory gem array when burying stash");
+            yield break;
+        }
+        
+        for(int i = 0; i < gemsToBuryArray.Length; i++)
+        {
+            if(gemsToBuryArray[i] > gemArray[i])
+            {
+                Debug.LogError("Error, not enough " + (Inventory.GemType)i + " gems to bury");
+                yield break;
+            }
+        }
+
+        DigSpot stashDigSpot = MapManager.Instance.AddStashDigSpot(this, gemsToBuryArray, currentSpace);
+        stashSpot = stashDigSpot;
+        inventory.RemoveGemArray(gemsToBuryArray);
+
         actionsLeft--;
+
+        FinishedStashing?.Invoke(this);
     }
 
     public virtual void UseItem()
@@ -202,7 +229,18 @@ public class Inventory
 
         // UpdateListeners();
         // Not updating here to instead allow for the flying item script to time it correctly with the item's arrival
+    }
 
+    public void AddGemArray(int[] gemsToAdd)
+    {
+        for (int i = 0; i < gemsToAdd.Length; i++)
+        {
+            gems[i] += gemsToAdd[i];
+        }
+        Debug.Log("Updated Gem Array" + GetGemArrayString());
+
+        // UpdateListeners();
+        // Not updating here to instead allow for the flying item script to time it correctly with the item's arrival
     }
     public bool HasGem(GemType gem)
     {
@@ -216,6 +254,15 @@ public class Inventory
     {
         Debug.Log("Removing " + gem.ToString() + " gem from inventory");
         gems[(int)gem] -= 1;
+        UpdateListeners();
+    }
+
+    public void RemoveGemArray(int[] gemsToRemove)
+    {
+        for(int i = 0; i < gemsToRemove.Length; i++)
+        {
+            gems[i] -= gemsToRemove[i];
+        }
         UpdateListeners();
     }
     public int[] GetGemArray()

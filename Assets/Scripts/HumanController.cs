@@ -66,4 +66,45 @@ public class HumanController : PlayerController
         }
     }
 
+    public void StashButtonSubmitted(int[] gemArray)
+    {
+        if(gemArray == null)
+        {
+            Debug.LogError("Invalid gemArray passed from StashButtonSubmitted");
+            return;
+        }
+        
+        if(gemArray.Length != 6)
+        {
+            Debug.LogError("Invalid gemArray passed from StashButtonSubmitted");
+            return;
+        }
+
+        bool valid = false;
+        foreach(int i in gemArray)
+        {
+            if(i > 0)
+            {
+                valid = true;
+            }else if(i < 0)
+            {
+                Debug.LogError("Invalid gemArray passed from StashButtonSubmitted");
+                return;
+            }
+        }
+        if(!valid)
+        {
+            Debug.LogError("Invalid gemArray (empty array) passed from StashButtonSubmitted");
+            return;
+        }
+
+        Debug.Log($"Requesting to stash gems: {gemArray[0]}, {gemArray[1]}, {gemArray[2]}, {gemArray[3]}, {gemArray[4]}, {gemArray[5]}");
+
+        if (LocalGameManager.Instance.RequestToStash(LocalGameManager.Instance.localPlayer))
+        {
+            Debug.Log($"[{nameof(StashButton)}] Stash request Accepted");
+            StartCoroutine(BuryStashCoroutine(gemArray));
+        }
+    }
+
 }

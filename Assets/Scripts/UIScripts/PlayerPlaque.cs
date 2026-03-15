@@ -19,16 +19,12 @@ public class PlayerPlaque : MonoBehaviour
     [SerializeField]
     protected GemsUI gemInventoryUI;
 
-
     public PlayerController player;
-
 
     [SerializeField]
     protected List<Sprite> gemSprites;
     [SerializeField]
     protected List<Sprite> plaqueSprites;
-    [SerializeField]
-    protected List<Sprite> stashSprites;
 
     [SerializeField]
     protected DiceTray diceTray;
@@ -58,7 +54,7 @@ public class PlayerPlaque : MonoBehaviour
     public void SetPlayerColor(int color)
     {
         plaqueImage.sprite = plaqueSprites[color];
-        stashSprite.sprite = stashSprites[color];
+        stashSprite.sprite = MapManager.Instance.stashSprites[color];
     }
 
 #region GemsUI

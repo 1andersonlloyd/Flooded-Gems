@@ -24,7 +24,7 @@ public class FloodThreatScale : MonoBehaviour
 
     public int getFloodThreatModifier()
     {
-        return floodThreatModifiers[StateManager.Instance.currentThreatIncrement];
+        return floodThreatModifiers[LocalGameManager.Instance.currentThreatIncrement];
     }
 
     void Awake()
@@ -53,14 +53,14 @@ public class FloodThreatScale : MonoBehaviour
     public void SetThreatModifier(int threatModifier)
     {
         threatTokenTarget = new Vector2(tokenXPositions[threatModifier], threatTokenTarget.y);
-        StateManager.Instance.currentThreatIncrement = threatModifier;
+        LocalGameManager.Instance.currentThreatIncrement = threatModifier;
     }
 
     public void IncrementThreatModifier()
     {
-        if (StateManager.Instance.currentThreatIncrement < 10)
+        if (LocalGameManager.Instance.currentThreatIncrement < 10)
         {
-            SetThreatModifier(StateManager.Instance.currentThreatIncrement + 1);
+            SetThreatModifier(LocalGameManager.Instance.currentThreatIncrement + 1);
         }
     }
 

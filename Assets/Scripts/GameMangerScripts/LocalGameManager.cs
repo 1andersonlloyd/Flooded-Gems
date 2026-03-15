@@ -13,19 +13,25 @@ using Unity.VisualScripting;
 // If this instance is on the host's machine, it will be the source of game state data for the HostGameManager directly and must be prepared to share all relevant data.
 // May need to implement a lock system to prevent the host from reading data at the same time it's being updated,
 //  or consider making a GameState struct that has ALL important data and sending when the host asks
+// Also, keep in mind that object references will not work across network, so IDs will need to be used to refer to specific players and such.
 
+public enum TurnPhase
+{
+    WaitingForPlayerInput, // Phase for player input/AI waiting. Possible time to interrupt
+    Cutscene, // Phase that is not possible to be interrupted
+    Interrupted, // Suspended gameplay for an interrupt
+    Ended, // Current turn is over, waiting to initiate the next turn/phase
+    FloodWaitingForPlayerInput, // TODO: Might just have a flag instead of seperate enum values for flood
+    FloodCutscene,
+    FloodInterrupted
+}
 public class LocalGameManager : MonoBehaviour
 {
     public static LocalGameManager Instance { get; private set; }
     public HumanController localPlayer;
     public HumanController humanPrefab;
     public AIController aiPrefab;
-    public PlayerPlaque playerPlaquePrefab;
-    public RectTransform plaqueBar;
-    public List<PlayerPlaque> playerPlaques = new List<PlayerPlaque>();
-    public ButtonBar currentTurnButtonBar;
-    public DigButton digButton; 
-
+    //public ButtonBar currentTurnButtonBar;
     public BoardSpace startingSpace;
     public int actionsPerTurn = 3;
 
@@ -33,31 +39,21 @@ public class LocalGameManager : MonoBehaviour
     public float waitTime = 5f;
     public bool waitInterrupted = false;
     public List<PlayerController> interruptingPlayers = new List<PlayerController>();
-    public WaitIndicator waitIndicator;
-    public DiceTray floodThreatDiceTray;
-    public DiceTray floodReachDiceTray;
-
-    public Dice die1;
-    public Dice die2;
-
     public static Action<PlayerController> StartingPlayerTurn;
+    public static Action<PlayerController> EndingPlayerTurn;
 
-    // Delete ?
-    public bool setLocalPlayerMoveEnabled(bool value)
-    {
-        if (localPlayer == null)
-        {
-            return false;
-        }
-        localPlayer.moveInputEnabled = value;
-        return true;
-    }
+    public (int, int) predictedFloodThreatRolls = (0, 0);
+    public int currentThreatIncrement = 0;
+    public List<PlayerController> players = new List<PlayerController>();
+    public int currentPlayerIndex = 0;
+    public TurnPhase currentPhase = TurnPhase.WaitingForPlayerInput;
+
 
     public PlayerController currentPlayer
     {
         get
         {
-            return StateManager.Instance.players[StateManager.Instance.currentPlayerIndex]; // Probably change to host check
+            return players[currentPlayerIndex]; // Probably change to host check
         }
     }
 
@@ -79,7 +75,6 @@ public class LocalGameManager : MonoBehaviour
         InitializeGame();
     }
 
-
     public void InitializeGame()
     {
         // TODO: Add some menu or something here for deciding players and hosting?
@@ -90,7 +85,7 @@ public class LocalGameManager : MonoBehaviour
 
 
         // Start first player's turn
-        StateManager.Instance.currentPlayerIndex = 0;
+        currentPlayerIndex = 0;
         StartTurn();
     }
 
@@ -109,7 +104,7 @@ public class LocalGameManager : MonoBehaviour
             string name = "Human " + (i + 1);
             HumanController human = Instantiate(humanPrefab);
             human.InitializePlayer(name, startingSpace, playerNumIncrement++);
-            StateManager.Instance.players.Add(human);
+            players.Add(human);
             UIManager.Instance.AddPlayerPlaque(human, numHumans + numAI,i);
 
 
@@ -127,7 +122,7 @@ public class LocalGameManager : MonoBehaviour
             string name = "CPU " + (i + 1 - numHumans);
             AIController ai = Instantiate(aiPrefab);
             ai.InitializePlayer(name, startingSpace, playerNumIncrement++);
-            StateManager.Instance.players.Add(ai);
+            players.Add(ai);
             UIManager.Instance.AddPlayerPlaque(ai, numHumans + numAI,i);
         }
     }
@@ -138,14 +133,8 @@ public class LocalGameManager : MonoBehaviour
     // This function start the given player's turn
     public void StartTurn()
     {
-        // Show the action bar UI if the current player is the local player
-        if (currentPlayer == localPlayer)
-        {
-            currentTurnButtonBar.Show();
-        }
-        
         // Trigger the start of the turn for the player directly
-        StateManager.Instance.players[StateManager.Instance.currentPlayerIndex].StartTurn();
+        players[currentPlayerIndex].StartTurn();
         // Send out event for turn start
         StartingPlayerTurn?.Invoke(currentPlayer);
     }
@@ -159,7 +148,7 @@ public class LocalGameManager : MonoBehaviour
         }
 
         // Check if it is player's phase
-        if (StateManager.Instance.currentPhase != TurnPhase.WaitingForPlayerInput)
+        if (currentPhase != TurnPhase.WaitingForPlayerInput)
         {
             Debug.LogError("It is not player's phase");
             return false;
@@ -196,7 +185,7 @@ public class LocalGameManager : MonoBehaviour
             return false;
         }
 
-        if (StateManager.Instance.currentPhase != TurnPhase.WaitingForPlayerInput)
+        if (currentPhase != TurnPhase.WaitingForPlayerInput)
         {
             Debug.LogError("Request to end turn denied for " + player.playerName + ". It is not the correct phase.");
             return false;
@@ -217,7 +206,7 @@ public class LocalGameManager : MonoBehaviour
             return false;
         }
 
-        if (StateManager.Instance.currentPhase != TurnPhase.WaitingForPlayerInput)
+        if (currentPhase != TurnPhase.WaitingForPlayerInput)
         {
             Debug.LogError("Request to dig denied for " + player.playerName + ". It is not the correct phase.");
             //return false;
@@ -242,16 +231,50 @@ public class LocalGameManager : MonoBehaviour
         return true;
     }
 
+    public bool RequestToStash(PlayerController player)
+    {
+        if (currentPlayer != player)
+        {
+            Debug.LogError("Request to stash denied for " + player.playerName + ". It is not their turn.");
+            return false;
+        }
+
+        if (currentPhase != TurnPhase.WaitingForPlayerInput)
+        {
+            Debug.LogError("Request to stash denied for " + player.playerName + ". It is not the correct phase.");
+            //return false;
+        }
+
+        if(player.actionsLeft < 1)
+        {
+            Debug.LogError("Request to stash denied for " + player.playerName + ". Not enough actions left to dig.");
+            return false;
+        }
+
+        if(player.stashSpot != null)
+        {
+            Debug.LogError("Request to stash denied for " + player.playerName + ". They already have a stash placed.");
+            return false;
+        }
+
+
+        if(player.currentSpace.digSpot != null)
+        {
+            Debug.LogError("Request to stash denied for " + player.playerName + ". Already a digspot on current space.");
+            return false;
+        }
+        Debug.Log("Request to stash accepted for " + player.playerName);
+        return true;
+    }
 
 
 
     // This function will be called by the player scripts
     private void EndCurrrentPlayersTurn()
     {
-        StateManager.Instance.players[StateManager.Instance.currentPlayerIndex].actionsLeft = 0;
-
-        currentTurnButtonBar.Hide();
-        StateManager.Instance.currentPhase = TurnPhase.Ended;
+        players[currentPlayerIndex].actionsLeft = 0;
+        currentPhase = TurnPhase.Ended;
+        EndingPlayerTurn?.Invoke(players[currentPlayerIndex]);
 
         // Update local player specific stuff
         if (currentPlayer == localPlayer)
@@ -260,9 +283,9 @@ public class LocalGameManager : MonoBehaviour
         }
 
         // Increment the current turn index, if it is at the end of the round trigger flood phase, otherwise start next player's turn
-        if (StateManager.Instance.currentPlayerIndex < StateManager.Instance.players.Count - 1)
+        if (currentPlayerIndex < players.Count - 1)
         {
-            StateManager.Instance.currentPlayerIndex++;
+            currentPlayerIndex++;
             StartTurn();
         }
         else
@@ -285,7 +308,7 @@ public class LocalGameManager : MonoBehaviour
 
         // Calculate Flood Threat
         List<int> threatResults = new List<int>{UnityEngine.Random.Range(1, 7), UnityEngine.Random.Range(1, 7)};
-        floodThreatDiceTray.RollDice(threatResults);
+        UIManager.Instance.RollFloodThreatDice(threatResults);
         
         yield return new WaitForSeconds(1.0f);
         Debug.Log("Flood Threat Roll: " + threatResults[0] + " + " + threatResults[1] + " + " + FloodThreatScale.Instance.getFloodThreatModifier() +
@@ -299,13 +322,13 @@ public class LocalGameManager : MonoBehaviour
         if (threatResults[0] + threatResults[1] + FloodThreatScale.Instance.getFloodThreatModifier() >= 12)
         {            
             // Roll flood dice
-            List<int> floodResults = new List<int>{UnityEngine.Random.Range(1, 7), UnityEngine.Random.Range(1, 7)};
-            floodReachDiceTray.RollDice(new List<int>{});
+            List<int> reachResults = new List<int>{UnityEngine.Random.Range(1, 7), UnityEngine.Random.Range(1, 7)};
+            UIManager.Instance.RollFloodReachDice(reachResults);
 
             yield return new WaitForSeconds(1.0f);
 
-            BoardSpace.SpaceType floodReach = FloodThreatScale.getFloodReach(floodResults[0] + floodResults[1]);
-            Debug.Log("Flood Reach Roll: " + floodResults[0] + " + " + floodResults[1] + " = " + floodReach + " spaces reached");
+            BoardSpace.SpaceType floodReach = FloodThreatScale.getFloodReach(reachResults[0] + reachResults[1]);
+            Debug.Log("Flood Reach Roll: " + reachResults[0] + " + " + reachResults[1] + " = " + floodReach + " spaces reached");
 
             // Highlight flooded spaces
             MapManager.Instance.HighlightFloodedSpaces(floodReach, 0.1f);
@@ -317,7 +340,7 @@ public class LocalGameManager : MonoBehaviour
             MapManager.Instance.HighlightFloodedSpaces(floodReach, 0);
 
             // For each player, check if they are on a space that is flooded
-            foreach (PlayerController player in StateManager.Instance.players)
+            foreach (PlayerController player in players)
             {
                 if ((int)player.currentSpace.spaceType >= (int)floodReach)
                 {
@@ -339,87 +362,13 @@ public class LocalGameManager : MonoBehaviour
         }
         // End the flood phase
         MapManager.Instance.ClearHighlights();
-        StateManager.Instance.currentPlayerIndex = 0;
+        currentPlayerIndex = 0;
 
-        floodReachDiceTray.Hide();
-        floodThreatDiceTray.Hide();
+        UIManager.Instance.HideFloodDiceTrays();
 
         // For now, just start the first player's turn
         StartTurn();
     }
-
-    // Old prototype, seems bad
-    // public void StartFloodPhase()
-    // {
-    //     Debug.Log("Starting Flood Phase");
-    //     // TODO: Implement flood phase logic, possibly in its own gameObject
-
-    //     // Calculate Flood Threat
-    //     int roll1 = die1.rollDie(0);
-    //     int roll2 = die2.rollDie(0);
-    //     Debug.Log("Flood Threat Roll: " + roll1 + " + " + roll2 + " + " + FloodThreatScale.Instance.getFloodThreatModifier() + " = " + (roll1 + roll2 + FloodThreatScale.Instance.getFloodThreatModifier()));
-    //     currentTotalDiceRoll = roll1 + roll2 + FloodThreatScale.Instance.getFloodThreatModifier();
-
-
-    //     // Allow players to use items
-    //     WaitForInterupts(waitTime, FloodThreatPhase);
-    // }
-    // public void FloodThreatPhase()
-    // {
-
-    //     if (currentTotalDiceRoll >= 12)
-    //     {
-    //         // Trigger Flood
-    //         int roll1 = die1.rollDie(0);
-    //         int roll2 = die2.rollDie(0);
-    //         currentTotalDiceRoll = roll1 + roll2;
-    //         BoardSpace.SpaceType floodReach = FloodThreatScale.getFloodReach(currentTotalDiceRoll);
-    //         Debug.Log("Flood Reach Roll: " + roll1 + " + " + roll2 + " = " + floodReach + " spaces reached");
-
-    //         // Highlight flooded spaces
-    //         MapManager.Instance.HighlightFloodedSpaces(floodReach, 0.1f);
-
-    //         // Allow players to use items
-    //         StartCoroutine(WaitForInteruptsCoroutine(waitTime, FloodIslandPhase));
-    //     }
-    //     else
-    //     {
-    //         FloodThreatScale.Instance.IncrementThreatModifier();
-    //         EndFloodPhase();
-    //     }
-
-
-
-    // }
-    // void FloodIslandPhase()
-    // {
-
-    //     BoardSpace.SpaceType floodReach = FloodThreatScale.getFloodReach(currentTotalDiceRoll);
-    //     MapManager.Instance.HighlightFloodedSpaces(floodReach, 0);
-
-    //     // For each player, check if they are on a space that is flooded
-    //     foreach (PlayerController player in StateManager.Instance.players)
-    //     {
-    //         if ((int)player.currentSpace.spaceType >= (int)floodReach)
-    //         {
-    //             Debug.Log(player.name + " is on a space that is flooded");
-    //             // Flood the player
-    //             FloodOut(player);
-    //         }
-    //     }
-
-    //     FloodThreatScale.Instance.SetThreatModifier(0);
-    //     StartCoroutine(WaitForInteruptsCoroutine(waitTime, EndFloodPhase));
-    // }
-
-    // private void EndFloodPhase()
-    // {
-    //     MapManager.Instance.ClearHighlights();
-    //     StateManager.Instance.currentPlayerIndex = 0;
-
-    //     // For now, just start the first player's turn
-    //     StartTurn();
-    // }
 
     public void FloodOut(PlayerController player)
     {
@@ -472,9 +421,9 @@ public class LocalGameManager : MonoBehaviour
 
             yield return null;
             timeLeft -= Time.deltaTime;
-            waitIndicator.SetPercentage(timeLeft / time);
+            UIManager.Instance.SetWaitIndicatorPercentage(timeLeft / time);
         }
-        waitIndicator.SetPercentage(0);
+        UIManager.Instance.SetWaitIndicatorPercentage(0);
         callback?.Invoke();
     }
 
@@ -492,9 +441,9 @@ public class LocalGameManager : MonoBehaviour
 
             yield return null;
             timeLeft -= Time.deltaTime;
-            waitIndicator.SetPercentage(timeLeft / time);
+            UIManager.Instance.SetWaitIndicatorPercentage(timeLeft / time);
         }
-        waitIndicator.SetPercentage(0);
+        UIManager.Instance.SetWaitIndicatorPercentage(0);
     }
     public void AddPlayerToInterruptList(PlayerController player)
     {
