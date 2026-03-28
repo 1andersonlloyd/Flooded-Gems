@@ -6,17 +6,16 @@ public class PriorityButton : MonoBehaviour
     Button button;
     bool holdingInterrupt = false;
     private Image buttonImage;
-    public Color normalColor = Color.white;
-    public Color pressedColor = Color.red;
-
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         button = GetComponent<Button>();
         buttonImage = GetComponent<Image>();
+        UIManager.Instance.SetButtonColors(button);
         UpdateButtonVisual();
         button.onClick.AddListener(HandleClick);
+        LocalGameManager.OnCurrentPhaseChanged += PhaseChange;
     }
 
     // Update is called once per frame
@@ -39,13 +38,17 @@ public class PriorityButton : MonoBehaviour
         }
     }
 
+    void PhaseChange(TurnPhase turnPhase)
+    {
+        UpdateButtonVisual();
+    }
 
     public void UpdateButtonVisual()
     {
-        if (buttonImage != null && LocalGameManager.Instance.localPlayer != null)
-        {
-            buttonImage.color = holdingInterrupt ? pressedColor : normalColor;
-        }
+        // if (buttonImage != null && LocalGameManager.Instance.localPlayer != null)
+        // {
+        //     button.interactable = LocalGameManager.Instance.currentPhase == TurnPhase.WaitingForPlayerInput;
+        // }
     }
 }
 

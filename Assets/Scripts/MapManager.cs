@@ -240,6 +240,12 @@ public class MapManager : MonoBehaviour
         return stash;
     }
 
+    public void RemoveDigSpotSpace(BoardSpace space)
+    {
+        digSpotSpaces.Remove(space);
+        Debug.Log("Removed dig spot from list, list now contains " + digSpotSpaces.Count + " spaces");
+    }
+
     void OnPlayerMove(PlayerController player, BoardSpace targetSpace)
     {
         ShiftPlayersOnSpace();

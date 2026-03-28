@@ -76,7 +76,7 @@ public abstract class PlayerController : MonoBehaviour
     {
         Debug.Log("Starting Turn for " + playerName);
         actionsLeft = LocalGameManager.Instance.actionsPerTurn;
-        LocalGameManager.Instance.currentPhase = TurnPhase.WaitingForPlayerInput;
+        LocalGameManager.Instance.currentPhase = TurnPhase.Interruptable;
     }
 
     public virtual void EndTurn()
@@ -139,8 +139,19 @@ public abstract class PlayerController : MonoBehaviour
         actionsLeft--;
 
         // Roll die
-        int dieResult = UnityEngine.Random.Range(1, 7);
-        UIManager.Instance.RollPlayerDie(this, dieResult);
+        int dieResult;
+        // Gives an automatic success if digging your own stash spot
+        if(digSpot.digSpotType == DigSpot.DigSpotType.StashSpot && digSpot.stashOwner == this)
+        {
+            dieResult = 6;
+            Debug.Log("Auto-success on stash dig");
+        }
+        else
+        // otherwise rolls a d6 normally
+        {
+            dieResult = UnityEngine.Random.Range(1, 7);
+            UIManager.Instance.RollPlayerDie(this, dieResult);
+        }
 
         // This is a bandaid fix to just let the die rolling animation finish
         yield return new WaitForSeconds(1f);
@@ -150,7 +161,9 @@ public abstract class PlayerController : MonoBehaviour
         RolledDieForDigging?.Invoke(this, digSpot, dieResult);
 
         // Wait for input/delay to allow for item usage in response
+        LocalGameManager.Instance.currentPhase = TurnPhase.Interruptable;
         yield return LocalGameManager.Instance.WaitForInteruptsCoroutine(LocalGameManager.Instance.waitTime, null);
+        LocalGameManager.Instance.currentPhase = TurnPhase.NonInterruptable;
 
 
         // Complete dig result
@@ -161,7 +174,6 @@ public abstract class PlayerController : MonoBehaviour
             aiSelectNewGoal = true;            
 
         }
-        //TurnManager.Instance.digButton.CompleteDig(); // Finishes the button animation
         FinishedDigRoll?.Invoke(this);
 
     }
@@ -285,6 +297,16 @@ public class Inventory
             }
         }
         return hasEveryGem;   
+    }
+
+    public int GetGemTotal()
+    {
+        int totalGems = 0;
+        for (int i = 0; i < gems.Length; i++)
+        {
+            totalGems += gems[i];
+        }
+        return totalGems;
     }
 
     // Item management

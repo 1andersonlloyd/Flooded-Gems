@@ -17,13 +17,11 @@ using Unity.VisualScripting;
 
 public enum TurnPhase
 {
-    WaitingForPlayerInput, // Phase for player input/AI waiting. Possible time to interrupt
-    Cutscene, // Phase that is not possible to be interrupted
+    Interruptable, // Phase for player input/AI waiting. Possible time to interrupt
+    NonInterruptable, // Phase where actions are being executed, no interrupts
     Interrupted, // Suspended gameplay for an interrupt
     Ended, // Current turn is over, waiting to initiate the next turn/phase
-    FloodWaitingForPlayerInput, // TODO: Might just have a flag instead of seperate enum values for flood
-    FloodCutscene,
-    FloodInterrupted
+
 }
 public class LocalGameManager : MonoBehaviour
 {
@@ -31,23 +29,34 @@ public class LocalGameManager : MonoBehaviour
     public HumanController localPlayer;
     public HumanController humanPrefab;
     public AIController aiPrefab;
-    //public ButtonBar currentTurnButtonBar;
     public BoardSpace startingSpace;
     public int actionsPerTurn = 3;
+    public List<PlayerController> players = new List<PlayerController>();
+    public int currentPlayerIndex = 0;
 
-
+    // Interrupt/Phases System Variables
     public float waitTime = 5f;
     public bool waitInterrupted = false;
     public List<PlayerController> interruptingPlayers = new List<PlayerController>();
+    public static Action<PlayerController> AddingPlayerToInterruptList;
+    public static Action<PlayerController> RemovingPlayerFromInterruptList;
+    public TurnPhase currentPhase // currentPhase is a wrapper for _currentPhase that allows all updates to be broadcasted through the event
+    {
+        get => _currentPhase;
+        set
+        {
+            _currentPhase = value;
+            OnCurrentPhaseChanged?.Invoke(_currentPhase);
+        }
+    }
+    private TurnPhase _currentPhase = TurnPhase.Interruptable;
+    public static Action<TurnPhase> OnCurrentPhaseChanged;
     public static Action<PlayerController> StartingPlayerTurn;
     public static Action<PlayerController> EndingPlayerTurn;
 
+    // Flood System Variables
     public (int, int) predictedFloodThreatRolls = (0, 0);
     public int currentThreatIncrement = 0;
-    public List<PlayerController> players = new List<PlayerController>();
-    public int currentPlayerIndex = 0;
-    public TurnPhase currentPhase = TurnPhase.WaitingForPlayerInput;
-
 
     public PlayerController currentPlayer
     {
@@ -148,7 +157,7 @@ public class LocalGameManager : MonoBehaviour
         }
 
         // Check if it is player's phase
-        if (currentPhase != TurnPhase.WaitingForPlayerInput)
+        if (currentPhase != TurnPhase.Interruptable)
         {
             Debug.LogError("It is not player's phase");
             return false;
@@ -185,7 +194,7 @@ public class LocalGameManager : MonoBehaviour
             return false;
         }
 
-        if (currentPhase != TurnPhase.WaitingForPlayerInput)
+        if (currentPhase != TurnPhase.Interruptable)
         {
             Debug.LogError("Request to end turn denied for " + player.playerName + ". It is not the correct phase.");
             return false;
@@ -206,7 +215,7 @@ public class LocalGameManager : MonoBehaviour
             return false;
         }
 
-        if (currentPhase != TurnPhase.WaitingForPlayerInput)
+        if (currentPhase != TurnPhase.Interruptable)
         {
             Debug.LogError("Request to dig denied for " + player.playerName + ". It is not the correct phase.");
             //return false;
@@ -239,7 +248,7 @@ public class LocalGameManager : MonoBehaviour
             return false;
         }
 
-        if (currentPhase != TurnPhase.WaitingForPlayerInput)
+        if (currentPhase != TurnPhase.Interruptable)
         {
             Debug.LogError("Request to stash denied for " + player.playerName + ". It is not the correct phase.");
             //return false;
@@ -302,7 +311,9 @@ public class LocalGameManager : MonoBehaviour
 
     IEnumerator FullFloodPhaseCoroutine()
     {
-        yield return new WaitForSeconds(1.0f);
+        currentPhase = TurnPhase.Interruptable;
+        yield return StartCoroutine(WaitForInteruptsCoroutineInline(1.0f));
+        currentPhase = TurnPhase.NonInterruptable;
 
         Debug.Log("Starting Flood Phase");
 
@@ -310,13 +321,18 @@ public class LocalGameManager : MonoBehaviour
         List<int> threatResults = new List<int>{UnityEngine.Random.Range(1, 7), UnityEngine.Random.Range(1, 7)};
         UIManager.Instance.RollFloodThreatDice(threatResults);
         
-        yield return new WaitForSeconds(1.0f);
+        currentPhase = TurnPhase.Interruptable;
+        yield return StartCoroutine(WaitForInteruptsCoroutineInline(1.0f));
+        currentPhase = TurnPhase.NonInterruptable;
+
         Debug.Log("Flood Threat Roll: " + threatResults[0] + " + " + threatResults[1] + " + " + FloodThreatScale.Instance.getFloodThreatModifier() +
          " = " + (threatResults[0] + threatResults[1] + FloodThreatScale.Instance.getFloodThreatModifier()));
 
         // Wait for Interrupts
-        yield return StartCoroutine(WaitForInteruptsCoroutine(waitTime, null));
-
+        currentPhase = TurnPhase.Interruptable;
+        yield return StartCoroutine(WaitForInteruptsCoroutineInline(1.0f));
+        currentPhase = TurnPhase.NonInterruptable;
+        
         // React to threat result
         // Flood triggers
         if (threatResults[0] + threatResults[1] + FloodThreatScale.Instance.getFloodThreatModifier() >= 12)
@@ -334,7 +350,9 @@ public class LocalGameManager : MonoBehaviour
             MapManager.Instance.HighlightFloodedSpaces(floodReach, 0.1f);
 
             // Allow players to use items
-            yield return StartCoroutine(WaitForInteruptsCoroutine(waitTime, null));
+            currentPhase = TurnPhase.Interruptable;
+            yield return StartCoroutine(WaitForInteruptsCoroutineInline(1.0f));
+            currentPhase = TurnPhase.NonInterruptable;
 
             // Flood the spaces
             MapManager.Instance.HighlightFloodedSpaces(floodReach, 0);
@@ -408,6 +426,7 @@ public class LocalGameManager : MonoBehaviour
     {
         StartCoroutine(WaitForInteruptsCoroutine(time, callback));
     }
+    // A coroutine that waits for a specified amount of time, but can be interrupted. A callback function can be called at the end of the wait period.
     public IEnumerator WaitForInteruptsCoroutine(float time, Action callback)
     {
         float timeLeft = time;
@@ -427,7 +446,7 @@ public class LocalGameManager : MonoBehaviour
         callback?.Invoke();
     }
 
-    private IEnumerator WaitForInteruptsCoroutineInline(float time)
+    public IEnumerator WaitForInteruptsCoroutineInline(float time)
     {
         Debug.Log("Waiting for interrupts");
         float timeLeft = time;
@@ -451,6 +470,7 @@ public class LocalGameManager : MonoBehaviour
         if (!interruptingPlayers.Contains(player))
         {
             interruptingPlayers.Add(player);
+            AddingPlayerToInterruptList?.Invoke(player);
         }
         // If any players are in the list, set the waitInterrupted to true
         if (interruptingPlayers.Count > 0)
@@ -464,6 +484,7 @@ public class LocalGameManager : MonoBehaviour
         if (interruptingPlayers.Contains(player))
         {
             interruptingPlayers.Remove(player);
+            RemovingPlayerFromInterruptList?.Invoke(player);
         }
         // If no players are in the list, set the waitInterrupted to false
         if (interruptingPlayers.Count == 0)
@@ -471,6 +492,12 @@ public class LocalGameManager : MonoBehaviour
             waitInterrupted = false;
         }
     }
+
+    public List<PlayerController> GetPlayerInterruptList()
+    {
+        return interruptingPlayers;
+    }
+
     #endregion
 }
 

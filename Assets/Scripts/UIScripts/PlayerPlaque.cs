@@ -29,6 +29,8 @@ public class PlayerPlaque : MonoBehaviour
     [SerializeField]
     protected DiceTray diceTray;
 
+    [SerializeField]
+    protected Image prioityIcon;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -120,5 +122,9 @@ public class PlayerPlaque : MonoBehaviour
         diceTray.Hide();
     }
 
+    public void SetPriorityIcon(bool active)
+    {
+        prioityIcon.color = active ? Color.white : Color.clear;
+    }
 
 }

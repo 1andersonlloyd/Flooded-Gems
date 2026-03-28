@@ -49,6 +49,8 @@ public class UIManager : MonoBehaviour
         LocalGameManager.StartingPlayerTurn += OnPlayerTurnStart;
         LocalGameManager.EndingPlayerTurn += OnPlayerTurnEnding;
         DigSpot.PlayerStashDestroyed += OnPlayerStashDestroyed;
+        LocalGameManager.AddingPlayerToInterruptList += UpdatePriorityIconsVisibility;
+        LocalGameManager.RemovingPlayerFromInterruptList += UpdatePriorityIconsVisibility;
     }
 
     public void AddPlayerPlaque(PlayerController player, int numberPlayers, int playerID)
@@ -111,6 +113,17 @@ public class UIManager : MonoBehaviour
     {
         plaqueDictionary[player].HideDiceTray();
     }
+
+    void UpdatePriorityIconsVisibility(PlayerController updatedPlayer)
+    {
+        List<PlayerController> interruptList = LocalGameManager.Instance.GetPlayerInterruptList();
+        foreach(PlayerPlaque plaque in playerPlaques)
+        {
+            plaque.SetPriorityIcon(interruptList.Contains(plaque.player));
+        }
+    }
+
+
 
 #endregion Plaque Actions
 #region Button Logic

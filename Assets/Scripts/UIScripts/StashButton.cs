@@ -42,9 +42,9 @@ public class StashButton : MonoBehaviour
         }
 
         DigSpot currentDigSpot = player.currentSpace?.digSpot;
-        if (button != null && LocalGameManager.Instance.localPlayer != null)
+        if (button != null && player != null)
         {
-            button.interactable = LocalGameManager.Instance.localPlayer.actionsLeft > 0 && UIManager.Instance.ActiveButtonCheck(button) && !currentDigSpot;
+            button.interactable = player.actionsLeft > 0 && player.inventory.GetGemTotal() > 0 && UIManager.Instance.ActiveButtonCheck(button) && !currentDigSpot;
             // TODO: Add a check to see if the player is allowed to stash right now to this logic
         }
     }

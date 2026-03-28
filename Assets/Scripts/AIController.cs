@@ -23,7 +23,11 @@ public class AIController : PlayerController
     {
         // For now just have the ai choose a new space to move towards each round randomly.
         while (actionsLeft > 0){
-            yield return new WaitForSeconds(1.0f);
+            // Allow time for interrupts before each action
+            LocalGameManager.Instance.currentPhase = TurnPhase.Interruptable;
+            yield return StartCoroutine(LocalGameManager.Instance.WaitForInteruptsCoroutineInline(1.0f));
+            LocalGameManager.Instance.currentPhase = TurnPhase.NonInterruptable;
+
             if(destinationSpace == null)
             {
                 Debug.Log(name + "'s destination was null, so it choose one randomly without checks.");
@@ -71,7 +75,6 @@ public class AIController : PlayerController
         // Place holder logic that will just wander
         // Pick a random space on the board
         //destinationSpace = MapManager.Instance.boardSpaces[UnityEngine.Random.Range(0, MapManager.Instance.boardSpaces.Count)];
-
 
 
         List<BoardSpace> digSpotSpaces = MapManager.Instance.GetAllDigSpotSpaces();

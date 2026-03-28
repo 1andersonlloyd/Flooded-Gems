@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.Events;
 using System;
+using UnityEngine.UI;
 
 
 public class DigSpot : MonoBehaviour
@@ -17,7 +18,7 @@ public class DigSpot : MonoBehaviour
     public DigSpotType digSpotType;
     public static Action PlayerStashDestroyed;
 
-    PlayerController stashOwner = null;
+    public PlayerController stashOwner = null;
     int[] stashContents = null;
     BoardSpace space = null;
 
@@ -47,6 +48,10 @@ public class DigSpot : MonoBehaviour
     void OnValidate()
     {
         textMeshRenderer.text = rollGoal.ToString();
+        if(digSpotType == DigSpotType.StashSpot)
+        {
+            textMeshRenderer.enabled = false;
+        }
     } 
 
     public void InitializeStashSpot(PlayerController player, int[] gemArray)
@@ -56,7 +61,7 @@ public class DigSpot : MonoBehaviour
         rollGoal = 6;
         stashContents = gemArray;
         spriteRenderer.sprite = MapManager.Instance.stashSprites[(int)player.playerColor];
-
+        textMeshRenderer.enabled = false;
 
         // TODO: Spawn the flying gem images
 
@@ -177,6 +182,7 @@ public class DigSpot : MonoBehaviour
         // Get the parent object
         BoardSpace space = GetComponentInParent<BoardSpace>();
         space.digSpot = null;
+        MapManager.Instance.RemoveDigSpotSpace(space);
         PlayerStashDestroyed?.Invoke();
         MapManager.Instance.ShiftPlayersOnSpace();
         Destroy(gameObject);
