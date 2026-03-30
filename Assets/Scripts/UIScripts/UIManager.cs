@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
     public static Canvas Canvas;
 
     public ButtonBar actionBar;
+    public ItemCardZone itemCardZone;
     public FloodThreatScale floodThreatScale;
 
     public RectTransform playerPlaqueBar;
@@ -51,6 +52,12 @@ public class UIManager : MonoBehaviour
         DigSpot.PlayerStashDestroyed += OnPlayerStashDestroyed;
         LocalGameManager.AddingPlayerToInterruptList += UpdatePriorityIconsVisibility;
         LocalGameManager.RemovingPlayerFromInterruptList += UpdatePriorityIconsVisibility;
+    }
+
+    // This is an alternative to start and awake that allows external timing by the LocalGameManager to ensure proper inits
+    public void Initialize()
+    {
+        itemCardZone.Initialize();
     }
 
     public void AddPlayerPlaque(PlayerController player, int numberPlayers, int playerID)

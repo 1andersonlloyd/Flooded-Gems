@@ -49,6 +49,7 @@ public class LocalGameManager : MonoBehaviour
             OnCurrentPhaseChanged?.Invoke(_currentPhase);
         }
     }
+    [SerializeField]
     private TurnPhase _currentPhase = TurnPhase.Interruptable;
     public static Action<TurnPhase> OnCurrentPhaseChanged;
     public static Action<PlayerController> StartingPlayerTurn;
@@ -88,13 +89,19 @@ public class LocalGameManager : MonoBehaviour
     {
         // TODO: Add some menu or something here for deciding players and hosting?
 
-        InitializePlayers(1, 3);
+        InitializePlayers(1, 1);
 
         // TODO: Set flood values to default
 
 
         // Start first player's turn
         currentPlayerIndex = 0;
+
+        
+        UIManager.Instance.Initialize();
+
+
+
         StartTurn();
     }
 
@@ -142,6 +149,7 @@ public class LocalGameManager : MonoBehaviour
     // This function start the given player's turn
     public void StartTurn()
     {
+        currentPhase = TurnPhase.Interruptable;
         // Trigger the start of the turn for the player directly
         players[currentPlayerIndex].StartTurn();
         // Send out event for turn start
@@ -156,12 +164,12 @@ public class LocalGameManager : MonoBehaviour
             return false;
         }
 
-        // Check if it is player's phase
-        if (currentPhase != TurnPhase.Interruptable)
-        {
-            Debug.LogError("It is not player's phase");
-            return false;
-        }
+        // // Check if it is player's phase (OUTDATED? THE AI WOULD HAVE CLAIMED PRIORITY AND POSSIBLY THE HUMANS TOO BY THIS POINT)
+        // if (currentPhase != TurnPhase.Interruptable)
+        // {
+        //     Debug.LogError("It is not player's phase");
+        //     return false;
+        // }
 
         // Check to see if player is already on the targetSpace
         if (player.currentSpace == targetSpace)
@@ -197,7 +205,7 @@ public class LocalGameManager : MonoBehaviour
         if (currentPhase != TurnPhase.Interruptable)
         {
             Debug.LogError("Request to end turn denied for " + player.playerName + ". It is not the correct phase.");
-            return false;
+            // return false;
         }
 
         Debug.Log("Request to end turn accepted for " + player.playerName);

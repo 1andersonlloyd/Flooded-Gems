@@ -37,7 +37,7 @@ public abstract class PlayerController : MonoBehaviour
 
     protected virtual void Awake()
     {
-        inventory = new Inventory();
+        inventory = new Inventory(this);
         spriteRenderer = GetComponent<SpriteRenderer>();
         targetPosition = transform.position;
         spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1);
@@ -227,10 +227,17 @@ public abstract class PlayerController : MonoBehaviour
 public class Inventory
 {
     public enum GemType{Green, Yellow, Red, Blue, Black, White, None}
-
+    public PlayerController inventoryOwner;
     public List<Item> items = new List<Item>();
     public int[] gems = new int[6];
     public Action<int[], int> onInventoryChanged;
+    public Action<PlayerController, Item> ItemAdded;
+    public Action<PlayerController, Item> ItemRemoved;
+
+    public Inventory(PlayerController owner = null)
+    {
+        inventoryOwner = owner;
+    }
 
     // Gem management
     public void AddGem(GemType gem)
@@ -315,6 +322,8 @@ public class Inventory
     
         Debug.Log("Adding item " + item.itemName + " to inventory");
         items.Add(item);
+        ItemAdded?.Invoke(inventoryOwner, item);
+
         //UpdateListeners();
         // Not updating here to instead allow for the flying item script to time it correctly with the item's arrival
     }
